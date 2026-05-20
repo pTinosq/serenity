@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     tracked_x_account: HttpUrl
 
     min_confidence: float = 0.7
-    max_order_amount: float = 100.0
+    max_order_amount_usd: float = 100.0
 
 
 def load_settings() -> Settings:

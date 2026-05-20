@@ -41,7 +41,7 @@ Executes the `TradeSignal` via `alpaca-py` (install with
 Bare-bones for now; the goal is just to learn the SDK well enough to
 turn a `TradeSignal` into an order. Orders are skipped if
 `confidence < MIN_CONFIDENCE` or implied notional exceeds
-`MAX_ORDER_AMOUNT`.
+`MAX_ORDER_AMOUNT_USD`.
 
 ## Settings
 
