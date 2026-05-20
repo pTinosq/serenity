@@ -22,17 +22,24 @@ a tweet body as a `str`, which means during development the test
 harness can substitute `input(":")` and the rest of the pipeline still
 works. This stage is implemented **last**.
 
-### 2. LLM interface (`src/serenity/llm.py`, not yet implemented)
+### 2. Oracle (`src/serenity/oracle/`)
 
-Input: tweet `str`. Output: a Pydantic `TradeSignal` derived via
-OpenAI's structured output, with fields roughly:
+The middle stage. Implemented. `Oracle.analyze(text)` reads a piece of
+text and returns a `TradeSignal`:
 
-- `ticker: str`
-- `order_type: Literal["BUY", "SELL"]`
-- `confidence: float` (0.0 – 1.0)
+- `ticker: str | None` — ticker explicitly mentioned in the text; None
+  if no ticker is named (no inference is allowed).
+- `order_type: Literal["BUY", "SELL"] | None` — direction implied by
+  sentiment. None when there is no actionable signal.
+- `confidence: float` (0.0 – 1.0) — clarity of the signal in the text.
 
-The system prompt that grounds the model lives alongside this module.
-Model id is configurable via `SENTIMENT_MODEL`.
+The system prompt lives at `oracle/prompt.md` and is loaded via
+`Path(__file__).parent / "prompt.md"`. The OpenAI client is a
+process-wide singleton via `functools.lru_cache(maxsize=1)`. Model id
+is configurable via `SENTIMENT_MODEL`.
+
+An interactive REPL at `src/serenity/cli/analyze.py` (`just oracle`)
+lets you type free-text and see the TradeSignal output.
 
 ### 3. Trading interface (`src/serenity/trading.py`, not yet implemented)
 

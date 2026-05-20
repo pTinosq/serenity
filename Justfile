@@ -15,6 +15,10 @@ start:
 install:
     uv sync
 
+# Run the Oracle REPL (interactive LLM signal extractor)
+oracle:
+    uv run python -m serenity.cli.analyze
+
 # Type-check / lint stubs (extend later)
 fmt:
     uv run ruff format src
