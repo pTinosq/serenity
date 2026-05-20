@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     log_level: LogLevel = "INFO"
 
     openai_api_key: SecretStr
-    sentiment_model: str = "gpt-5-nano"
+    sentiment_model: str = "gpt5.4-nano"
 
     tracked_x_account: HttpUrl
 
