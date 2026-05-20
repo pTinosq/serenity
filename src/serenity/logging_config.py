@@ -1,14 +1,13 @@
 import logging
-import os
 
 from rich.logging import RichHandler
 
+from serenity.config import LogLevel
 
-def setup_logging(level: str | None = None) -> None:
-    log_level = (level or os.getenv("LOG_LEVEL") or "INFO").upper()
 
+def setup_logging(level: LogLevel) -> None:
     logging.basicConfig(
-        level=log_level,
+        level=level,
         format="%(message)s",
         datefmt="[%X]",
         handlers=[
