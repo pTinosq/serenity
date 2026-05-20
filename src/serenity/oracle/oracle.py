@@ -6,7 +6,7 @@ from openai import OpenAI
 from serenity.config import Settings, load_settings
 from serenity.oracle.models import TradeSignal
 
-_PROMPT_PATH = Path(__file__).parent / "prompt.md"
+PROMPT_PATH = Path(__file__).parent / "prompt.md"
 
 
 class OracleError(RuntimeError):
@@ -14,14 +14,14 @@ class OracleError(RuntimeError):
 
 
 @lru_cache(maxsize=1)
-def _get_client() -> OpenAI:
+def get_client() -> OpenAI:
     settings = load_settings()
     return OpenAI(api_key=settings.openai_api_key.get_secret_value())
 
 
 @lru_cache(maxsize=1)
-def _system_prompt() -> str:
-    return _PROMPT_PATH.read_text(encoding="utf-8")
+def system_prompt() -> str:
+    return PROMPT_PATH.read_text(encoding="utf-8")
 
 
 class Oracle:
@@ -39,8 +39,8 @@ class Oracle:
         settings: Settings | None = None,
         client: OpenAI | None = None,
     ) -> None:
-        self._settings = settings or load_settings()
-        self._client = client or _get_client()
+        self.settings = settings or load_settings()
+        self.client = client or get_client()
 
     def analyze(self, text: str) -> TradeSignal:
         """Read `text` and return the trade signal it implies.
@@ -48,10 +48,10 @@ class Oracle:
         Raises OracleError when the model refuses or returns no parsed
         output. OpenAI SDK errors (auth, rate limit, network) propagate.
         """
-        completion = self._client.chat.completions.parse(
-            model=self._settings.sentiment_model,
+        completion = self.client.chat.completions.parse(
+            model=self.settings.sentiment_model,
             messages=[
-                {"role": "system", "content": _system_prompt()},
+                {"role": "system", "content": system_prompt()},
                 {"role": "user", "content": text},
             ],
             response_format=TradeSignal,
