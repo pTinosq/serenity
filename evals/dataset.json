@@ -8,5 +8,85 @@
         "gt": 0.6
       }
     }
+  },
+  {
+    "tweet": "Just in: $SIVE gets $6.6M from the US CHIPS ACT.\n\nThis is a $6.6M Year 2 Program. \n\nIn  collaboration with BAE Systems: \"Modernizing U.S. Defense Infrastructure Using Sivers Technology\"\n\nThis is incredibly bullish to have such a small company in $SIVE to get CHIPS ACT funding. \n\nAs it positions Sivers as a critical, US-government backstopped chokepoint for national security.",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gt": 0.88
+      }
+    }
+  },
+  {
+    "tweet": "Just your normal Monday correction in the AI space from \n$NBIS\n to \n$LITE\n to \n$AAOI\n?",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0.0
+      }
+    }
+  },
+  {
+    "tweet": "$POET\n literally won the Fake it Until you make it award.\n\n-> Grey area endless marketing of crap through influencers. \n\n-> Diluted retail enough to hoard tons of cash\n\n-> Cash is sets baseline Market Cap.\n\nNow \n$POET\n probably has around $830M pure cash from dilution after $400m private placement. \n\nWhile their marketcap was sitting under $500m last year.",
+    "result": {
+      "ticker": "POET",
+      "order_type": "SELL",
+      "confidence": {
+        "gt": 0.8
+      }
+    }
+  },
+  {
+    "tweet": "$BOT\n is the biggest red flag.\n\nNAV is $7.34/share. The stock is now trading at $37.92.\n\nYou are basically buying Figure at $200B+ while it's valued at $39B.\n\nBuying the company is just trading pyramid float dynamics off other retail.\n\nNot the appreciation or underlying fundamentals. \n\nTo make matters worse: \n\nThere's $2B dilution as valuation arbitrage as you all get diluted to oblivion. \n\nI got a lot of fund managers dming influencers like myself about it but in reality:\n\nRetail just looks like exit liquidity.",
+    "result": {
+      "ticker": "BOT",
+      "order_type": "SELL",
+      "confidence": {
+        "gt": 0.7
+      }
+    }
+  },
+  {
+    "tweet": "$SIVE is now aiming to become the next \n$LITE\n, a US photonics giant. \n\nThey're re-centering their board around US executives + US photonics.\n\nSo the core board are now: US \n$GFS\n Executives and $CITI Executives, with the company run by UC Berkeley grads and \n$LITE\n executives. \n\nThe 3 members leaving were local Swedish/EU.\n\nThis is just a shift in strategy from focusing on developing local Swedish Semi environments:\n\nTo dominating the US/global photonics market. I'm not trying to discredit their service/background. \n\nBut in my view to focus around US/global photonics markets, it's likely optimal to have more US executives. \n\nBut they should all be proud for helping make $SIVE what it is today.",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gt": 0.75
+      }
+    }
+  },
+  {
+    "tweet": "Just to add to the very positive $SIVE news amid MSCI likely tens of millions of inflow in 2 weeks:\n\n$AMZN\n has a new private placement with AlChip. \n\nProbably implying design wins with future Trainium.\n\nIf you don't remember… AlChip was Ayar's lead customer. And $SIVE is the primary laser supplier to Ayar.\n\nSo implications for $SIVE, is enormous piggybacking off of Amazon's ecosystem growth.",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gt": 0.9
+      }
+    }
+  },
+  {
+    "tweet": "HOW DOES \n$POET\n ($3.14B) HAVE A HIGHER VALUATION THAN FOCI (3363, $3.1B)???\n\nFOCI IS LITERALLY THE BOTTLENECK FOR CPO VOLUME RAMP AND MAIN SUPPLIER FOR \n$TSM\n AND \n$NVDA\n.\n\nHigh conviction Foci outperforms once institutions find this name. ",
+    "result": {
+      "ticker": "POET",
+      "order_type": "SELL",
+      "confidence": {
+        "gt": 0.9
+      }
+    }
+  },
+  {
+    "tweet": "I do like Harmonic Drive (6324) as the Western Leader (eg. harmonic reduction gear) at ~$4.2B MC.\n\nVery large part of robotics/humanoid BOM value.\n\nI actually like Leader Drive more (since it's cheaper for mass production, covers more parts). And maybe Sanhua for \n$TSLA\n Optimus. \n\nBut prefer to advance Western supply chains with my capital over ones in China. \n\nIt's not just profiting off markets, but what you want to get accomplished as well (helping advance US supply chains and Robotics leaders).",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0.0
+      }
+    }
   }
 ]
