@@ -1,0 +1,12 @@
+[
+  {
+    "tweet": "Apple just reported record iPhone sales for the quarter, blowing past analyst expectations.",
+    "result": {
+      "ticker": "AAPL",
+      "order_type": "BUY",
+      "confidence": {
+        "gt": 0.6
+      }
+    }
+  }
+]

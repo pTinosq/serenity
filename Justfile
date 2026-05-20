@@ -23,6 +23,10 @@ install:
 oracle:
     uv run python -m serenity.cli.analyze
 
+# Run the Oracle against the dev eval dataset (evals/dataset.json)
+eval:
+    uv run python evals/run.py
+
 # Type-check / lint stubs (extend later)
 fmt:
     uv run ruff format src
