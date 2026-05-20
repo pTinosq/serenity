@@ -22,10 +22,10 @@
   {
     "tweet": "Just your normal Monday correction in the AI space from \n$NBIS\n to \n$LITE\n to \n$AAOI\n?",
     "result": {
-      "ticker": null,
-      "order_type": "NO_TRADE",
+      "ticker": "N/A",
+      "order_type": "N/A",
       "confidence": {
-        "gt": 0.5
+        "eq": 0.0
       }
     }
   },
@@ -82,10 +82,10 @@
   {
     "tweet": "I do like Harmonic Drive (6324) as the Western Leader (eg. harmonic reduction gear) at ~$4.2B MC.\n\nVery large part of robotics/humanoid BOM value.\n\nI actually like Leader Drive more (since it's cheaper for mass production, covers more parts). And maybe Sanhua for \n$TSLA\n Optimus. \n\nBut prefer to advance Western supply chains with my capital over ones in China. \n\nIt's not just profiting off markets, but what you want to get accomplished as well (helping advance US supply chains and Robotics leaders).",
     "result": {
-      "ticker": "TSLA",
-      "order_type": "NO_TRADE",
+      "ticker": "N/A",
+      "order_type": "N/A",
       "confidence": {
-        "gt": 0.5
+        "eq": 0.0
       }
     }
   }
