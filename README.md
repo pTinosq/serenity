@@ -1,1 +1,11 @@
-# serenity
+# Serenity
+
+Your personal AI trader whose only strategy is to look at the most recent tweets from [Serenity's X account](https://x.com/aleabitoreddit) and make trades based on the content of the tweets.
+
+## How it works
+
+1. Listen for new tweets from Serenity
+2. Use AI to understand what the tweet is suggesting about a stock
+3. Make a trade based on the tweet
+4. ???
+5. Profit
