@@ -27,11 +27,16 @@ works. This stage is implemented **last**.
 The middle stage. Implemented. `Oracle.analyze(text)` reads a piece of
 text and returns a `TradeSignal`:
 
-- `ticker: str | None` — ticker explicitly mentioned in the text; None
-  if no ticker is named (no inference is allowed).
-- `order_type: Literal["BUY", "SELL"] | None` — direction implied by
-  sentiment. None when there is no actionable signal.
-- `confidence: float` (0.0 – 1.0) — clarity of the signal in the text.
+- `ticker: str` — ticker explicitly mentioned or very confidently
+  inferred from a well-known company name. The string `"N/A"` is the
+  abstention sentinel (no identifiable ticker).
+- `order_type: Literal["BUY", "SELL", "N/A"]` — direction implied by
+  sentiment, or `"N/A"` when the text doesn't give enough to act on
+  (no ticker, observational text, hedged sentiment, or multiple
+  tickers without a dominant subject). When `order_type == "N/A"`,
+  `ticker` must also be `"N/A"`.
+- `confidence: float` (0.0 – 1.0) — clarity of the signal in the
+  text. Must be exactly `0.0` when `order_type == "N/A"`.
 
 The system prompt lives at `oracle/prompt.md` and is loaded via
 `Path(__file__).parent / "prompt.md"`. The OpenAI client is a
