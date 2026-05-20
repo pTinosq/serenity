@@ -5,6 +5,7 @@ Your personal AI trader whose only strategy is to look at the most recent tweets
 ## Requirements
 
 - [`gum`](https://github.com/charmbracelet/gum#installation) — used for the interactive settings UI. Install via the link above (`brew install gum` on macOS).
+- An **OpenAI API key** — required to run the LLM stage. Grab one from <https://platform.openai.com/api-keys> and either set `OPENAI_API_KEY` in your `.env` or paste it into the **Settings** menu after running `serenity`.
 
 ## How it works
 

@@ -57,6 +57,25 @@ All config lives in `src/serenity/config.py` via `pydantic-settings`
 list. Required values (`OPENAI_API_KEY`, `TRACKED_X_ACCOUNT`) fail
 loudly at startup if missing.
 
+Users can edit settings interactively via the `Settings` entry of the
+main menu (see below). Edits are validated per-field with a pydantic
+`TypeAdapter` and written back to `.env` via `python-dotenv`'s
+`set_key`.
+
+## Entry points
+
+`serenity` (no args) opens an interactive menu (Start / Settings /
+Exit), rendered via [gum](https://github.com/charmbracelet/gum). gum is
+a runtime prerequisite, not a Python dep — see the README.
+
+Pass `--headless` to skip the menu and go straight to the bot loop.
+`just dev` and `just start-headless` use `--headless`; `just start`
+opens the menu.
+
+User-facing UI components (gum wrapper, main menu, settings editor)
+live in `src/serenity/ui/`. `src/serenity/cli/` is reserved for
+developer scripts (e.g. the Oracle REPL at `cli/analyze.py`).
+
 ## Conventions
 
 - **Always** use `uv add` / `uv add --dev` for dependencies — never

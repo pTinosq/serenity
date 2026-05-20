@@ -1,5 +1,6 @@
-from typing import Literal
+from typing import Annotated, Literal
 
+from annotated_types import Ge, Le
 from pydantic import HttpUrl, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -21,8 +22,8 @@ class Settings(BaseSettings):
 
     tracked_x_account: HttpUrl
 
-    min_confidence: float = 0.7
-    max_order_amount_usd: float = 100.0
+    min_confidence: Annotated[float, Ge(0.0), Le(1.0)] = 0.7
+    max_order_amount_usd: Annotated[float, Ge(0.0)] = 100.0
 
 
 def load_settings() -> Settings:
