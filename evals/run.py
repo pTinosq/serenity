@@ -55,7 +55,7 @@ class ConfidenceCondition(BaseModel):
 
 class ExpectedResult(BaseModel):
     ticker: str | None = None
-    order_type: Literal["BUY", "SELL"] | None = None
+    order_type: Literal["BUY", "SELL", "NO_TRADE"]
     confidence: ConfidenceCondition = ConfidenceCondition()
 
 
