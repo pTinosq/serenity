@@ -7,7 +7,7 @@ in the file.
 """
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any, Literal, get_args, get_origin
 
 from dotenv import dotenv_values, set_key
 from pydantic import TypeAdapter, ValidationError
@@ -63,15 +63,39 @@ def validate(field_name: str, raw: str) -> str | None:
     return None
 
 
-def edit_field(field_name: str, env_var: str, current: str) -> None:
-    is_secret = field_name in SECRET_FIELDS
-    try:
-        new_value = gum.ask(
-            prompt=f"{env_var}: ",
-            value="" if is_secret else current,
-            placeholder="paste new value" if is_secret else "",
-            password=is_secret,
+def literal_choices(annotation: Any) -> tuple[str, ...] | None:
+    """If `annotation` is a Literal[...] of strings, return its choices."""
+    if get_origin(annotation) is Literal:
+        args = get_args(annotation)
+        if all(isinstance(a, str) for a in args):
+            return args
+    return None
+
+
+def prompt_new_value(field_name: str, env_var: str, current: str) -> str | None:
+    """Pick the right gum widget for the field's type and return the raw input."""
+    annotation = Settings.model_fields[field_name].annotation
+
+    choices = literal_choices(annotation)
+    if choices is not None:
+        return gum.choose(
+            *choices,
+            header=f"{env_var} — pick a value",
+            selected=current or None,
         )
+
+    is_secret = field_name in SECRET_FIELDS
+    return gum.ask(
+        prompt=f"{env_var}: ",
+        value="" if is_secret else current,
+        placeholder="paste new value" if is_secret else "",
+        password=is_secret,
+    )
+
+
+def edit_field(field_name: str, env_var: str, current: str) -> None:
+    try:
+        new_value = prompt_new_value(field_name, env_var, current)
     except KeyboardInterrupt:
         return
 
