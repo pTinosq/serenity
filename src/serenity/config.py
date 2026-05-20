@@ -1,5 +1,6 @@
 from typing import Literal
 
+from pydantic import HttpUrl, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -14,6 +15,14 @@ class Settings(BaseSettings):
     )
 
     log_level: LogLevel = "INFO"
+
+    openai_api_key: SecretStr
+    sentiment_model: str = "gpt5.4-nano"
+
+    tracked_x_account: HttpUrl
+
+    min_confidence: float = 0.7
+    max_order_amount_usd: float = 100.0
 
 
 def load_settings() -> Settings:
