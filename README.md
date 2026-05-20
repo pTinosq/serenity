@@ -2,6 +2,10 @@
 
 Your personal AI trader whose only strategy is to look at the most recent tweets from [Serenity's X account](https://x.com/aleabitoreddit) and make trades based on the content of the tweets.
 
+## Requirements
+
+- [`gum`](https://github.com/charmbracelet/gum#installation) — used for the interactive settings UI. Install via the link above (`brew install gum` on macOS).
+
 ## How it works
 
 1. Listen for new tweets from Serenity
