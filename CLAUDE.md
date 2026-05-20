@@ -76,6 +76,18 @@ User-facing UI components (gum wrapper, main menu, settings editor)
 live in `src/serenity/ui/`. `src/serenity/cli/` is reserved for
 developer scripts (e.g. the Oracle REPL at `cli/analyze.py`).
 
+## Evals
+
+`evals/` holds a dev-only eval harness, separate from the product.
+`evals/dataset.json` is a list of `{tweet, result}` cases; `result`
+specifies the expected ticker, order_type, and confidence conditions
+(`gt` / `lt` / `eq`, combined with AND). `just eval` runs each case
+through the Oracle and prints per-case marks plus a summary with
+per-dimension accuracy and a weighted score (ticker 0.4, order 0.5,
+confidence 0.1). The "Order | correct ticker" row in the summary
+surfaces the cascading nature of these dimensions — a trade with the
+right action but the wrong ticker is still useless.
+
 ## Conventions
 
 - **Always** use `uv add` / `uv add --dev` for dependencies — never
