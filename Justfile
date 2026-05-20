@@ -5,11 +5,11 @@ default:
 
 # Run in dev mode with auto-reload on file changes
 dev:
-    uv run watchfiles "python -m serenity" src
+    uv run watchfiles "serenity" src
 
 # Run in production mode
 start:
-    uv run python -m serenity
+    uv run serenity
 
 # Install / sync dependencies
 install:
