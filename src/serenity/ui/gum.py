@@ -31,11 +31,17 @@ def run_gum(args: list[str]) -> str:
     return result.stdout.strip("\n")
 
 
-def choose(*options: str, header: str | None = None) -> str:
+def choose(
+    *options: str,
+    header: str | None = None,
+    selected: str | None = None,
+) -> str:
     """Show a vertical chooser; return the selected option as a string."""
     args = ["gum", "choose"]
     if header:
         args += ["--header", header]
+    if selected:
+        args += ["--selected", selected]
     args += list(options)
     return run_gum(args)
 
