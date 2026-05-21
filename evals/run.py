@@ -6,8 +6,8 @@ at `evals/dataset.json` and is shaped as a list of:
     {
       "tweet": "...",
       "result": {
-        "ticker": "NVDA" | null,
-        "order_type": "BUY" | "SELL" | null,
+        "ticker": "NVDA" | "N/A",
+        "order_type": "BUY" | "SELL" | "N/A",
         "confidence": {"gt": 0.7, "lt": 1.0, "eq": null}
       }
     }
@@ -17,9 +17,16 @@ score for a case is a weighted sum of three checks; weights live in the
 constants at the top of this file. Per-dimension accuracy is reported
 alongside, so the "critical" dimensions (ticker, order) show up even
 when the weighted score looks healthy.
+
+Pass --quiet to suppress the banner, per-case progress prints, and the
+verbose per-case table. Quiet mode prints only the summary plus a
+compact failures list — suitable for an LLM consumer reading the
+output without burning tokens on noise.
 """
 
+import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Literal
 
@@ -52,6 +59,16 @@ class ConfidenceCondition(BaseModel):
             return False
         return True
 
+    def describe(self) -> str:
+        parts = []
+        if self.gt is not None:
+            parts.append(f"gt {self.gt}")
+        if self.lt is not None:
+            parts.append(f"lt {self.lt}")
+        if self.eq is not None:
+            parts.append(f"eq {self.eq}")
+        return " & ".join(parts) if parts else "any"
+
 
 class ExpectedResult(BaseModel):
     ticker: str
@@ -72,6 +89,20 @@ class CaseOutcome(BaseModel):
     order_ok: bool = False
     conf_ok: bool = False
     weighted: float = 0.0
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(prog="evals/run.py")
+    parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help=(
+            "Suppress progress prints and the verbose per-case table. "
+            "Print only the summary plus a compact failures list."
+        ),
+    )
+    return parser.parse_args(argv)
 
 
 def load_dataset() -> list[EvalCase]:
@@ -183,7 +214,43 @@ def render_summary(outcomes: list[CaseOutcome], console: Console) -> None:
     console.print(table)
 
 
+def render_failures(outcomes: list[CaseOutcome], console: Console) -> None:
+    """Compact per-failure breakdown: what was expected vs what was got, per dimension."""
+    failures = [
+        (i, o)
+        for i, o in enumerate(outcomes, 1)
+        if o.error or not (o.ticker_ok and o.order_ok and o.conf_ok)
+    ]
+    if not failures:
+        console.print("\n[green]No failures.[/]")
+        return
+
+    console.print(f"\n[bold]Failures ({len(failures)}):[/]")
+    for i, o in failures:
+        snippet = o.case.tweet.replace("\n", " ").strip()[:60]
+        snippet += "…" if len(o.case.tweet) > 60 else ""
+        if o.error or o.signal is None:
+            console.print(f"  [{i}] ERROR: {(o.error or '')[:80]}  — \"{snippet}\"")
+            continue
+        reasons: list[str] = []
+        if not o.ticker_ok:
+            reasons.append(
+                f"ticker expected {o.case.result.ticker!r}, got {o.signal.ticker!r}"
+            )
+        if not o.order_ok:
+            reasons.append(
+                f"order expected {o.case.result.order_type}, got {o.signal.order_type}"
+            )
+        if not o.conf_ok:
+            reasons.append(
+                f"confidence expected {o.case.result.confidence.describe()}, "
+                f"got {o.signal.confidence:.2f}"
+            )
+        console.print(f"  [{i}] {'; '.join(reasons)}  — \"{snippet}\"")
+
+
 def main() -> None:
+    args = parse_args(sys.argv[1:])
     settings = load_settings()
     setup_logging(settings.log_level)
 
@@ -191,20 +258,25 @@ def main() -> None:
     oracle = Oracle(settings=settings)
 
     console = Console()
-    console.print(
-        f"Running [bold]{len(cases)}[/] case(s) through "
-        f"[bold cyan]{settings.sentiment_model}[/]...\n"
-    )
+    if not args.quiet:
+        console.print(
+            f"Running [bold]{len(cases)}[/] case(s) through "
+            f"[bold cyan]{settings.sentiment_model}[/]...\n"
+        )
 
     outcomes: list[CaseOutcome] = []
     for i, case in enumerate(cases, 1):
-        preview = case.tweet[:80] + ("..." if len(case.tweet) > 80 else "")
-        console.print(f"  [{i}/{len(cases)}] {preview}")
+        if not args.quiet:
+            preview = case.tweet[:80] + ("..." if len(case.tweet) > 80 else "")
+            console.print(f"  [{i}/{len(cases)}] {preview}")
         outcomes.append(evaluate_case(case, oracle))
 
-    console.print()
-    render_results(outcomes, console)
+    if not args.quiet:
+        console.print()
+        render_results(outcomes, console)
+
     render_summary(outcomes, console)
+    render_failures(outcomes, console)
 
 
 if __name__ == "__main__":
