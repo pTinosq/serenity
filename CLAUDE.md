@@ -39,9 +39,12 @@ text and returns a `TradeSignal`:
   text. Must be exactly `0.0` when `order_type == "N/A"`.
 
 The system prompt lives at `oracle/prompt.md` and is loaded via
-`Path(__file__).parent / "prompt.md"`. The OpenAI client is a
+`Path(__file__).parent / "prompt.md"`. The OpenRouter client is a
 process-wide singleton via `functools.lru_cache(maxsize=1)`. Model id
-is configurable via `SENTIMENT_MODEL`.
+is configurable via `SENTIMENT_MODEL` and uses OpenRouter's
+`provider/model` format (e.g. `openai/gpt-5.4-nano`). Structured
+output is enforced via `response_format={"type": "json_schema", ...}`
+with `strict: true` and the schema is derived from `TradeSignal`.
 
 An interactive REPL at `src/serenity/cli/analyze.py` (`just oracle`)
 lets you type free-text and see the TradeSignal output.
@@ -59,7 +62,7 @@ turn a `TradeSignal` into an order. Orders are skipped if
 
 All config lives in `src/serenity/config.py` via `pydantic-settings`
 (env + `.env`). `.env.example` is the source of truth for the full
-list. Required values (`OPENAI_API_KEY`, `TRACKED_X_ACCOUNT`) fail
+list. Required values (`OPENROUTER_API_KEY`, `TRACKED_X_ACCOUNT`) fail
 loudly at startup if missing.
 
 Users can edit settings interactively via the `Settings` entry of the
