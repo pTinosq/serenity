@@ -13,14 +13,17 @@ and tested in isolation:
 [Twitter] --tweet: str--> [LLM] --TradeSignal--> [Trading]
 ```
 
-### 1. Twitter interface (`src/serenity/twitter.py`, not yet implemented)
+### 1. Twitter interface (`src/serenity/twitter.py`)
 
-Streams the most recent tweets from a tracked X account. The X API is
-expensive, so the production implementation will most likely be a
-scraper — that decision is unresolved. The interface only ever yields
-a tweet body as a `str`, which means during development the test
-harness can substitute `input(":")` and the rest of the pipeline still
-works. This stage is implemented **last**.
+`stream_tweets(settings)` yields the body of each new tweet from
+`TRACKED_X_ACCOUNT` as a `str`. Backed by X's filtered stream via
+the official `xdk` SDK — push-based, near-realtime (~6s P99), with
+SDK-managed auto-reconnect. On startup we wipe any leftover stream
+rules from previous sessions (X stores rules server-side per app)
+and install a fresh `from:<handle>` rule. The stream only delivers
+tweets posted after the connection opens, so restarts don't replay
+stale signal. The interface intentionally yields `str` so it
+remains swappable with `input(":")` for offline dev.
 
 ### 2. Oracle (`src/serenity/oracle/`)
 
@@ -62,8 +65,8 @@ turn a `TradeSignal` into an order. Orders are skipped if
 
 All config lives in `src/serenity/config.py` via `pydantic-settings`
 (env + `.env`). `.env.example` is the source of truth for the full
-list. Required values (`OPENROUTER_API_KEY`, `TRACKED_X_ACCOUNT`) fail
-loudly at startup if missing.
+list. Required values (`OPENROUTER_API_KEY`, `TRACKED_X_ACCOUNT`,
+`X_BEARER_TOKEN`) fail loudly at startup if missing.
 
 Users can edit settings interactively via the `Settings` entry of the
 main menu (see below). Edits are validated per-field with a pydantic

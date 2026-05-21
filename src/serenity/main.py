@@ -3,6 +3,8 @@ import logging
 
 from serenity.config import load_settings
 from serenity.logging_config import setup_logging
+from serenity.oracle.oracle import Oracle, OracleError
+from serenity.twitter import stream_tweets
 from serenity.ui.menu import run_menu
 
 log = logging.getLogger(__name__)
@@ -19,9 +21,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def start_bot() -> None:
-    """Run the bot loop. Placeholder until the Twitter and Trading stages land."""
+    """Stream tweets → Oracle → log signal. Trading stage not yet wired in."""
     log.info("Starting [bold cyan]serenity[/] :sparkles:")
-    log.debug("Loaded settings: %s", load_settings().model_dump())
+    settings = load_settings()
+    oracle = Oracle(settings=settings)
+
+    for tweet in stream_tweets(settings):
+        log.info("Tweet: %s", tweet[:120].replace("\n", " "))
+        try:
+            signal = oracle.analyze(tweet)
+        except OracleError:
+            log.exception("Oracle failed on tweet")
+            continue
+        log.info("Signal: %s", signal.model_dump())
 
 
 def main() -> None:

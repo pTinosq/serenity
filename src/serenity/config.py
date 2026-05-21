@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     sentiment_model: str = "openai/gpt-5.4-nano"
 
     tracked_x_account: HttpUrl
+    x_bearer_token: SecretStr
 
     min_confidence: Annotated[float, Ge(0.0), Le(1.0)] = 0.7
     max_order_amount_usd: Annotated[float, Ge(0.0)] = 100.0
