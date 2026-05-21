@@ -20,11 +20,12 @@ FIELDS: list[tuple[str, str]] = [
     ("openrouter_api_key", "OPENROUTER_API_KEY"),
     ("sentiment_model", "SENTIMENT_MODEL"),
     ("tracked_x_account", "TRACKED_X_ACCOUNT"),
+    ("x_bearer_token", "X_BEARER_TOKEN"),
     ("min_confidence", "MIN_CONFIDENCE"),
     ("max_order_amount_usd", "MAX_ORDER_AMOUNT_USD"),
 ]
 
-SECRET_FIELDS = {"openrouter_api_key"}
+SECRET_FIELDS = {"openrouter_api_key", "x_bearer_token"}
 
 KEY_COL = max(len(env_var) for _, env_var in FIELDS)
 BACK = "← Back"
