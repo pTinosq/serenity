@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from openai import OpenAI
+from openrouter import OpenRouter
 
 from serenity.config import Settings, load_settings
 from serenity.oracle.models import TradeSignal
@@ -14,14 +14,21 @@ class OracleError(RuntimeError):
 
 
 @lru_cache(maxsize=1)
-def get_client() -> OpenAI:
+def get_client() -> OpenRouter:
     settings = load_settings()
-    return OpenAI(api_key=settings.openai_api_key.get_secret_value())
+    return OpenRouter(api_key=settings.openrouter_api_key.get_secret_value())
 
 
 @lru_cache(maxsize=1)
 def system_prompt() -> str:
     return PROMPT_PATH.read_text(encoding="utf-8")
+
+
+@lru_cache(maxsize=1)
+def trade_signal_schema() -> dict:
+    schema = TradeSignal.model_json_schema()
+    schema["additionalProperties"] = False
+    return schema
 
 
 class Oracle:
@@ -37,7 +44,7 @@ class Oracle:
         self,
         *,
         settings: Settings | None = None,
-        client: OpenAI | None = None,
+        client: OpenRouter | None = None,
     ) -> None:
         self.settings = settings or load_settings()
         self.client = client or get_client()
@@ -45,18 +52,29 @@ class Oracle:
     def analyze(self, text: str) -> TradeSignal:
         """Read `text` and return the trade signal it implies.
 
-        Raises OracleError when the model refuses or returns no parsed
-        output. OpenAI SDK errors (auth, rate limit, network) propagate.
+        Raises OracleError when the model returns no content or output
+        that fails schema validation. OpenRouter SDK errors (auth, rate
+        limit, network) propagate.
         """
-        completion = self.client.chat.completions.parse(
+        result = self.client.chat.send(
             model=self.settings.sentiment_model,
             messages=[
                 {"role": "system", "content": system_prompt()},
                 {"role": "user", "content": text},
             ],
-            response_format=TradeSignal,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "trade_signal",
+                    "strict": True,
+                    "schema": trade_signal_schema(),
+                },
+            },
         )
-        message = completion.choices[0].message
-        if message.parsed is None:
-            raise OracleError(message.refusal or "Model returned no parsed output")
-        return message.parsed
+        content = result.choices[0].message.content
+        if not content:
+            raise OracleError("Model returned no content")
+        try:
+            return TradeSignal.model_validate_json(content)
+        except ValueError as e:
+            raise OracleError(f"Failed to parse model output: {e}") from e
