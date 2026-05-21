@@ -88,5 +88,25 @@
         "eq": 0.0
       }
     }
+  },
+  {
+    "tweet": "Nebius [ \n$NBIS\n ] at $86.69 is the purest Neocloud and AI-infra asymmetry left. \n\nThis is the highest revenue Neocloud untouched by \n$CIFR\n | \n$WULF\n and colo providers that has no:\n\n- Plaguing uncertainty that \n$IREN\n, \n$ORCL\n face from  full-stack execution. \n\n- High interest debt that \n$CRWV\n, \n$APLD\n, and others face.\n\n- Revenue uncertainty at scale with Hyperscaler contracts that \n$CLSK\n, $BITF, \n$WYFI\n, \n$SLNH\n, and others lack. \n\nAfter the market-wide drop with the AI sector overrun by fear: \n\nNebius is going forward with: $8B midpoint ARR next year, $4.7B+ in cash, diversification in enterprise clients from ( \n$META\n, \n$MSFT\n, \n$ACN\n, \n$SHOP\n, Governments), hyper-growth portfolio companies, and a proven full-stack high-margin business.\n\nWith extreme demand, execution uncertainty (margins), and isolation from current issues plaguing the markets with OpenAI contract dependency and credit tightening:\n\nNothing even comes close to Nebius in terms of asymmetrical upside.\n\nYou are simply just waiting for company execution.",
+    "result": {
+      "ticker": "NBIS",
+      "order_type": "BUY",
+      "confidence": {
+        "gt": 0.85
+      }
+    }
+  },
+  {
+    "tweet": "People are really out there saying, don’t doubt me off 10% returns.\n\nI present to you: \n$AXTI",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0.0
+      }
+    }
   }
 ]
