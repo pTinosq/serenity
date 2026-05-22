@@ -72,9 +72,18 @@ trades are skipped); `sentiment` is the *sizer*. Returns a
 - `SKIPPED_NO_SIGNAL` — `order_type == "N/A"`.
 - `SKIPPED_LOW_CONFIDENCE` — `confidence < MIN_CONFIDENCE`.
 - `SKIPPED_BELOW_MIN_TRADE` — sized below `MIN_TRADE_USD`.
+- `SKIPPED_PRICE_TOO_HIGH` — opening a short but one share costs more than the sized notional (see below).
 - `SKIPPED_NO_CASH` — Alpaca cash balance below `MIN_TRADE_USD`.
 - `SKIPPED_NO_CREDENTIALS` — Alpaca keys not set; rest of pipeline runs.
 - `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
+
+Alpaca disallows fractional shorts: submitting a SELL with `notional`
+on a ticker we don't hold returns `42210000`. We catch that, fetch
+the last trade price via `StockHistoricalDataClient`, recompute as
+`qty = floor(notional / price)`, and retry. If `qty < 1` (stock
+costs more than the sized notional), the trade is skipped with
+`SKIPPED_PRICE_TOO_HIGH`. Closing-long SELLs on tickers we hold are
+not affected and continue to use fractional notional.
 
 `ALPACA_PAPER` defaults to `True`, so the default install is safe.
 The `TradingClient` is a process-wide singleton via
