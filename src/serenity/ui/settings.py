@@ -56,7 +56,11 @@ def format_row(env_var: str, display: str) -> str:
 def validate(field_name: str, raw: str) -> str | None:
     """Return an error message if `raw` is invalid for `field_name`, else None."""
     field = Settings.model_fields[field_name]
-    annotation = Annotated[(field.annotation, *field.metadata)] if field.metadata else field.annotation
+    annotation = (
+        Annotated[(field.annotation, *field.metadata)]
+        if field.metadata
+        else field.annotation
+    )
     try:
         TypeAdapter(annotation).validate_python(raw)
     except ValidationError as e:

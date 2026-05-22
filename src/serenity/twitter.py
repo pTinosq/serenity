@@ -34,6 +34,10 @@ def stream_tweets(settings: Settings) -> Iterator[str]:
         data = post_response.model_dump()
         if data.get("data"):
             tweet = data["data"]
-            text = tweet.get("text", "") if isinstance(tweet, dict) else getattr(tweet, "text", "")
+            text = (
+                tweet.get("text", "")
+                if isinstance(tweet, dict)
+                else getattr(tweet, "text", "")
+            )
             if text:
                 yield text

@@ -52,21 +52,29 @@ with `strict: true` and the schema is derived from `TradeSignal`.
 An interactive REPL at `src/serenity/cli/analyze.py` (`just oracle`)
 lets you type free-text and see the TradeSignal output.
 
-### 3. Trading interface (`src/serenity/trading.py`, not yet implemented)
+### 3. Trading interface (`src/serenity/trading.py`)
 
-Executes the `TradeSignal` via `alpaca-py` (install with
-`uv add alpaca-py` when we start — deliberately not added yet).
-Bare-bones for now; the goal is just to learn the SDK well enough to
-turn a `TradeSignal` into an order. Orders are skipped if
-`confidence < MIN_CONFIDENCE` or implied notional exceeds
-`MAX_ORDER_AMOUNT_USD`.
+`execute_trade(signal, settings)` turns a `TradeSignal` into a market
+order via `alpaca-py`. Bare-bones: submits a `MarketOrderRequest` with
+`notional = MAX_ORDER_AMOUNT_USD` (fractional shares, so notional is
+the natural sizing). Returns a `TradeOutcome` enum:
+
+- `EXECUTED` — order submitted.
+- `SKIPPED_NO_SIGNAL` — `order_type == "N/A"`.
+- `SKIPPED_LOW_CONFIDENCE` — `confidence < MIN_CONFIDENCE`.
+- `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
+
+`ALPACA_PAPER` defaults to `True`, so the default install is safe.
+The `TradingClient` is a process-wide singleton via
+`functools.lru_cache(maxsize=1)`, same pattern as the Oracle client.
 
 ## Settings
 
 All config lives in `src/serenity/config.py` via `pydantic-settings`
 (env + `.env`). `.env.example` is the source of truth for the full
 list. Required values (`OPENROUTER_API_KEY`, `TRACKED_X_ACCOUNT`,
-`X_BEARER_TOKEN`) fail loudly at startup if missing.
+`X_BEARER_TOKEN`, `ALPACA_API_KEY`, `ALPACA_SECRET_KEY`) fail loudly
+at startup if missing.
 
 Users can edit settings interactively via the `Settings` entry of the
 main menu (see below). Edits are validated per-field with a pydantic

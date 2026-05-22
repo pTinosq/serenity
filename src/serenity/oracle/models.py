@@ -12,7 +12,7 @@ class TradeSignal(BaseModel):
         description=(
             "Ticker symbol explicitly mentioned in the text (e.g. NVDA, AAPL), "
             "or very confidently inferred from a well-known company name. "
-            "Use \"N/A\" when no ticker can be identified."
+            'Use "N/A" when no ticker can be identified.'
         )
     )
     order_type: OrderType = Field(
@@ -20,8 +20,8 @@ class TradeSignal(BaseModel):
             "BUY if the text implies bullish action on the ticker. SELL if "
             "bearish. N/A when the text does not give enough to act on — no "
             "ticker, ambiguous sentiment, observational, or multiple tickers "
-            "with no dominant subject. When ticker is \"N/A\", order_type "
-            "must also be \"N/A\"."
+            'with no dominant subject. When ticker is "N/A", order_type '
+            'must also be "N/A".'
         )
     )
     confidence: float = Field(
@@ -29,6 +29,6 @@ class TradeSignal(BaseModel):
         le=1.0,
         description=(
             "How clearly the text supports the chosen order_type, on a 0.0-1.0 "
-            "scale. Higher = more clear. Must be 0.0 when order_type is \"N/A\"."
+            'scale. Higher = more clear. Must be 0.0 when order_type is "N/A".'
         ),
     )

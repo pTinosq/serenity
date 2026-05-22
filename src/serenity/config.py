@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     min_confidence: Annotated[float, Ge(0.0), Le(1.0)] = 0.7
     max_order_amount_usd: Annotated[float, Ge(0.0)] = 100.0
 
+    alpaca_api_key: SecretStr
+    alpaca_secret_key: SecretStr
+    alpaca_paper: bool = True
+
 
 def load_settings() -> Settings:
     return Settings()
