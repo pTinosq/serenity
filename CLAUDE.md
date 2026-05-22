@@ -105,6 +105,27 @@ main menu (see below). Edits are validated per-field with a pydantic
 `TypeAdapter` and written back to `.env` via `python-dotenv`'s
 `set_key`.
 
+## Alerts
+
+`src/serenity/alerts/` is a modular notification layer for things the
+bot couldn't act on but the user might want to act on manually (a
+strong signal on a non-US ticker, etc.). One file per channel.
+Currently shipped:
+
+- `stdout.py` — rich panel printed to the terminal.
+
+Future channels (telegram, discord, ...) drop in as new files and get
+listed in `dispatcher.active_channels()` once their credentials are
+configured. Call site:
+
+```python
+from serenity.alerts import Alert, dispatch
+dispatch(Alert(reason="not_tradeable", title=..., signal=signal, detail=...))
+```
+
+The dispatcher swallows per-channel errors so a broken telegram bot
+won't silence stdout.
+
 ## Entry points
 
 `serenity` (no args) opens an interactive menu (Start / Settings /

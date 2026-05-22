@@ -27,6 +27,7 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.enums import OrderSide, TimeInForce
 from alpaca.trading.requests import MarketOrderRequest
 
+from serenity.alerts import Alert, dispatch
 from serenity.config import Settings, load_settings
 from serenity.oracle.models import TradeSignal
 
@@ -223,6 +224,17 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
                 "or delisted ticker the Oracle misidentified as US-listed)",
                 signal.ticker,
             )
+            dispatch(Alert(
+                reason="not_tradeable",
+                title=f"{signal.ticker} not tradeable on Alpaca",
+                signal=signal,
+                detail=(
+                    "Alpaca rejected this ticker as inactive. Most often it's "
+                    "a foreign listing (e.g. Nasdaq Stockholm) the Oracle "
+                    "couldn't tell apart from a US cashtag. Trade manually on "
+                    "your own broker if you want exposure."
+                ),
+            ))
             return TradeOutcome.SKIPPED_NOT_TRADEABLE
         if is_fractional_short_rejection(e, side):
             log.info("Retrying %s SELL as whole-share short", signal.ticker)
