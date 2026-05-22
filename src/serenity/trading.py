@@ -26,6 +26,7 @@ class TradeOutcome(str, Enum):
     EXECUTED = "executed"
     SKIPPED_NO_SIGNAL = "skipped:no_signal"
     SKIPPED_LOW_CONFIDENCE = "skipped:low_confidence"
+    SKIPPED_NO_CREDENTIALS = "skipped:no_credentials"
     FAILED = "failed"
 
 
@@ -57,6 +58,14 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
             settings.min_confidence,
         )
         return TradeOutcome.SKIPPED_LOW_CONFIDENCE
+
+    if not settings.alpaca_api_key or not settings.alpaca_secret_key:
+        log.warning(
+            "Skipping %s: Alpaca credentials not configured "
+            "(set ALPACA_API_KEY and ALPACA_SECRET_KEY in .env)",
+            signal.ticker,
+        )
+        return TradeOutcome.SKIPPED_NO_CREDENTIALS
 
     side = OrderSide.BUY if signal.order_type == "BUY" else OrderSide.SELL
     notional = settings.max_order_amount_usd

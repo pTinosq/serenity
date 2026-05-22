@@ -62,6 +62,7 @@ the natural sizing). Returns a `TradeOutcome` enum:
 - `EXECUTED` — order submitted.
 - `SKIPPED_NO_SIGNAL` — `order_type == "N/A"`.
 - `SKIPPED_LOW_CONFIDENCE` — `confidence < MIN_CONFIDENCE`.
+- `SKIPPED_NO_CREDENTIALS` — Alpaca keys not set; rest of pipeline runs.
 - `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
 
 `ALPACA_PAPER` defaults to `True`, so the default install is safe.
@@ -73,8 +74,10 @@ The `TradingClient` is a process-wide singleton via
 All config lives in `src/serenity/config.py` via `pydantic-settings`
 (env + `.env`). `.env.example` is the source of truth for the full
 list. Required values (`OPENROUTER_API_KEY`, `TRACKED_X_ACCOUNT`,
-`X_BEARER_TOKEN`, `ALPACA_API_KEY`, `ALPACA_SECRET_KEY`) fail loudly
-at startup if missing.
+`X_BEARER_TOKEN`) fail loudly at startup if missing. Alpaca keys
+(`ALPACA_API_KEY`, `ALPACA_SECRET_KEY`) are optional — if absent, the
+Twitter→Oracle pipeline still runs and `execute_trade` returns
+`SKIPPED_NO_CREDENTIALS`.
 
 Users can edit settings interactively via the `Settings` entry of the
 main menu (see below). Edits are validated per-field with a pydantic

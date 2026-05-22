@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     min_confidence: Annotated[float, Ge(0.0), Le(1.0)] = 0.7
     max_order_amount_usd: Annotated[float, Ge(0.0)] = 100.0
 
-    alpaca_api_key: SecretStr
-    alpaca_secret_key: SecretStr
+    alpaca_api_key: SecretStr | None = None
+    alpaca_secret_key: SecretStr | None = None
     alpaca_paper: bool = True
 
 
