@@ -55,13 +55,24 @@ lets you type free-text and see the TradeSignal output.
 ### 3. Trading interface (`src/serenity/trading.py`)
 
 `execute_trade(signal, settings)` turns a `TradeSignal` into a market
-order via `alpaca-py`. Bare-bones: submits a `MarketOrderRequest` with
-`notional = MAX_ORDER_AMOUNT_USD` (fractional shares, so notional is
-the natural sizing). Returns a `TradeOutcome` enum:
+order via `alpaca-py`. Submits a `MarketOrderRequest` sized by
+sentiment magnitude:
+
+```
+notional = clamp(signal.sentiment * MAX_TRADE_USD, MIN_TRADE_USD, MAX_TRADE_USD)
+notional = min(notional, available_cash)
+```
+
+So weaker calls cost less and the bot doesn't blow its budget on the
+first hot signal. `confidence` remains the *gate* (sub-`MIN_CONFIDENCE`
+trades are skipped); `sentiment` is the *sizer*. Returns a
+`TradeOutcome` enum:
 
 - `EXECUTED` — order submitted.
 - `SKIPPED_NO_SIGNAL` — `order_type == "N/A"`.
 - `SKIPPED_LOW_CONFIDENCE` — `confidence < MIN_CONFIDENCE`.
+- `SKIPPED_BELOW_MIN_TRADE` — sized below `MIN_TRADE_USD`.
+- `SKIPPED_NO_CASH` — Alpaca cash balance below `MIN_TRADE_USD`.
 - `SKIPPED_NO_CREDENTIALS` — Alpaca keys not set; rest of pipeline runs.
 - `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
 

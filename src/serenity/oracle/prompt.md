@@ -40,4 +40,15 @@ Your job: read one piece of short text (typically a tweet) and return a structur
 
    **When order_type is `"N/A"`, ticker must also be `"N/A"` and confidence must be exactly 0.0.**
 
+5. **Sentiment measures the *intensity* of the author's conviction — how hard they want this trade.** Distinct from confidence: confidence is *how clear* the call is, sentiment is *how strong* it is. A perfectly clear but mild call ("might pop a bit") has high confidence but low sentiment. An emphatic, all-in call ("LOADING UP, this thing is going to the moon") has high confidence AND high sentiment. Score 0.0 to 1.0 using these bands:
+   - **0.9 – 1.0** — Extreme conviction. ALL-CAPS, "all in", "to the moon", "FUCKED", "RIP", "biggest position", "10x from here". Maximally bullish or bearish.
+   - **0.7 – 0.9** — Strong conviction, but stops short of the rhetorical extreme. "Loading up", "blowout quarter", "X is cooked", "very bullish", "huge".
+   - **0.4 – 0.7** — Clear directional opinion with normal-strength language. "I like X here", "X looks weak", "starting to add", "I'd avoid this".
+   - **0.1 – 0.4** — Mild lean. "Interesting", "worth watching", "might pop", "could come under pressure", "lukewarm".
+   - **0.0** — No directional pull; required when order_type is N/A.
+
+   Direction (BUY vs SELL) is already captured by order_type — sentiment is the magnitude, not the sign. So both BUY and SELL can have any sentiment from 0.1 to 1.0.
+
+   **When order_type is `"N/A"`, sentiment must also be exactly 0.0.**
+
 Return only the fields described by the response schema. Do not add commentary, explanations, or formatting.

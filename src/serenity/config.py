@@ -24,7 +24,8 @@ class Settings(BaseSettings):
     x_bearer_token: SecretStr
 
     min_confidence: Annotated[float, Ge(0.0), Le(1.0)] = 0.7
-    max_order_amount_usd: Annotated[float, Ge(0.0)] = 100.0
+    min_trade_usd: Annotated[float, Ge(0.0)] = 10.0
+    max_trade_usd: Annotated[float, Ge(0.0)] = 100.0
 
     alpaca_api_key: SecretStr | None = None
     alpaca_secret_key: SecretStr | None = None

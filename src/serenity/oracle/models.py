@@ -32,3 +32,14 @@ class TradeSignal(BaseModel):
             'scale. Higher = more clear. Must be 0.0 when order_type is "N/A".'
         ),
     )
+    sentiment: float = Field(
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Magnitude of the author's conviction — how hard they want this "
+            "trade, on a 0.0-1.0 scale. Distinct from confidence: confidence "
+            "is how clear the call is, sentiment is how strong it is. A mild "
+            'lean ("might pop") scores low; "to the moon" / "FUCKED" scores '
+            'near 1.0. Must be 0.0 when order_type is "N/A".'
+        ),
+    )

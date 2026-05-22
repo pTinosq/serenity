@@ -1,8 +1,10 @@
 """Execute TradeSignals via Alpaca.
 
-Bare-bones: turn a TradeSignal into a market order, sized by
-MAX_ORDER_AMOUNT_USD as notional. Skips no-signal cases and anything
-below MIN_CONFIDENCE. Paper trading is the default.
+Position size scales with the signal's sentiment magnitude:
+    notional = clamp(sentiment * MAX_TRADE_USD, MIN_TRADE_USD, MAX_TRADE_USD)
+and is further clamped to the account's available cash. Skips
+no-signal cases, anything below MIN_CONFIDENCE, and orders that would
+fall below MIN_TRADE_USD. Paper trading is the default.
 """
 
 from __future__ import annotations
@@ -26,6 +28,8 @@ class TradeOutcome(str, Enum):
     EXECUTED = "executed"
     SKIPPED_NO_SIGNAL = "skipped:no_signal"
     SKIPPED_LOW_CONFIDENCE = "skipped:low_confidence"
+    SKIPPED_BELOW_MIN_TRADE = "skipped:below_min_trade"
+    SKIPPED_NO_CASH = "skipped:no_cash"
     SKIPPED_NO_CREDENTIALS = "skipped:no_credentials"
     FAILED = "failed"
 
@@ -42,6 +46,16 @@ def get_client() -> TradingClient:
         secret_key=settings.alpaca_secret_key.get_secret_value(),
         paper=settings.alpaca_paper,
     )
+
+
+def size_trade(signal: TradeSignal, available_cash: float, settings: Settings) -> float:
+    """Return the notional USD to deploy for this signal, before any skip checks.
+
+    Caller checks the result against `MIN_TRADE_USD`; trades sized below the
+    floor are skipped rather than rounded up.
+    """
+    target = signal.sentiment * settings.max_trade_usd
+    return min(target, settings.max_trade_usd, available_cash)
 
 
 def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
@@ -67,18 +81,41 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
         )
         return TradeOutcome.SKIPPED_NO_CREDENTIALS
 
-    side = OrderSide.BUY if signal.order_type == "BUY" else OrderSide.SELL
-    notional = settings.max_order_amount_usd
+    client = get_client()
+    cash = float(client.get_account().cash)
 
+    if cash < settings.min_trade_usd:
+        log.warning(
+            "Skipping %s: cash $%.2f < MIN_TRADE_USD $%.2f",
+            signal.ticker,
+            cash,
+            settings.min_trade_usd,
+        )
+        return TradeOutcome.SKIPPED_NO_CASH
+
+    notional = size_trade(signal, cash, settings)
+    if notional < settings.min_trade_usd:
+        log.info(
+            "Skipping %s: sized to $%.2f, below MIN_TRADE_USD $%.2f "
+            "(sentiment=%.2f, cash=$%.2f)",
+            signal.ticker,
+            notional,
+            settings.min_trade_usd,
+            signal.sentiment,
+            cash,
+        )
+        return TradeOutcome.SKIPPED_BELOW_MIN_TRADE
+
+    side = OrderSide.BUY if signal.order_type == "BUY" else OrderSide.SELL
     request = MarketOrderRequest(
         symbol=signal.ticker,
-        notional=notional,
+        notional=round(notional, 2),
         side=side,
         time_in_force=TimeInForce.DAY,
     )
 
     try:
-        order = get_client().submit_order(order_data=request)
+        order = client.submit_order(order_data=request)
     except APIError as e:
         if e.status_code == 401:
             mode = "paper" if settings.alpaca_paper else "live"
@@ -91,11 +128,13 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
         raise TradingError(f"Alpaca rejected {side.value} {signal.ticker}: {e}") from e
 
     log.info(
-        "Order %s: %s $%.2f %s — status=%s",
+        "Order %s: %s $%.2f %s (sentiment=%.2f, cash=$%.2f) — status=%s",
         order.id,
         side.value,
         notional,
         signal.ticker,
+        signal.sentiment,
+        cash,
         order.status,
     )
     return TradeOutcome.EXECUTED
