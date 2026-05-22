@@ -80,6 +80,14 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
     try:
         order = get_client().submit_order(order_data=request)
     except APIError as e:
+        if e.status_code == 401:
+            mode = "paper" if settings.alpaca_paper else "live"
+            raise TradingError(
+                f"Alpaca rejected {side.value} {signal.ticker}: 401 unauthorized. "
+                f"ALPACA_PAPER is {settings.alpaca_paper} ({mode} endpoint) — "
+                f"make sure your ALPACA_API_KEY/ALPACA_SECRET_KEY are {mode} keys. "
+                "Paper and live keys are not interchangeable."
+            ) from e
         raise TradingError(f"Alpaca rejected {side.value} {signal.ticker}: {e}") from e
 
     log.info(
