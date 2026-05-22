@@ -23,9 +23,12 @@ FIELDS: list[tuple[str, str]] = [
     ("x_bearer_token", "X_BEARER_TOKEN"),
     ("min_confidence", "MIN_CONFIDENCE"),
     ("max_order_amount_usd", "MAX_ORDER_AMOUNT_USD"),
+    ("alpaca_api_key", "ALPACA_API_KEY"),
+    ("alpaca_secret_key", "ALPACA_SECRET_KEY"),
+    ("alpaca_paper", "ALPACA_PAPER"),
 ]
 
-SECRET_FIELDS = {"openrouter_api_key", "x_bearer_token"}
+SECRET_FIELDS = {"openrouter_api_key", "x_bearer_token", "alpaca_api_key", "alpaca_secret_key"}
 
 KEY_COL = max(len(env_var) for _, env_var in FIELDS)
 BACK = "← Back"
@@ -85,6 +88,14 @@ def prompt_new_value(field_name: str, env_var: str, current: str) -> str | None:
     if choices is not None:
         return gum.choose(
             *choices,
+            header=f"{env_var} — pick a value",
+            selected=current or None,
+        )
+
+    if annotation is bool:
+        return gum.choose(
+            "True",
+            "False",
             header=f"{env_var} — pick a value",
             selected=current or None,
         )
