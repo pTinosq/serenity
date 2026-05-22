@@ -39,6 +39,7 @@ class TradeOutcome(str, Enum):
     SKIPPED_LOW_CONFIDENCE = "skipped:low_confidence"
     SKIPPED_BELOW_MIN_TRADE = "skipped:below_min_trade"
     SKIPPED_PRICE_TOO_HIGH = "skipped:price_too_high"
+    SKIPPED_NOT_TRADEABLE = "skipped:not_tradeable"
     SKIPPED_NO_CASH = "skipped:no_cash"
     SKIPPED_NO_CREDENTIALS = "skipped:no_credentials"
     FAILED = "failed"
@@ -89,6 +90,12 @@ def is_fractional_short_rejection(e: APIError, side: OrderSide) -> bool:
         and e.status_code == 422
         and "fractional" in str(e).lower()
     )
+
+
+def is_asset_not_tradeable(e: APIError) -> bool:
+    """Alpaca rejects unknown / inactive / non-US tickers with code 40010001."""
+    msg = str(e).lower()
+    return e.status_code == 422 and ("not active" in msg or "not found" in msg)
 
 
 def alpaca_401_message(settings: Settings, side: OrderSide, ticker: str) -> str:
@@ -210,6 +217,13 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
     except APIError as e:
         if e.status_code == 401:
             raise TradingError(alpaca_401_message(settings, side, signal.ticker)) from e
+        if is_asset_not_tradeable(e):
+            log.warning(
+                "Skipping %s: not tradeable on Alpaca (likely a foreign listing "
+                "or delisted ticker the Oracle misidentified as US-listed)",
+                signal.ticker,
+            )
+            return TradeOutcome.SKIPPED_NOT_TRADEABLE
         if is_fractional_short_rejection(e, side):
             log.info("Retrying %s SELL as whole-share short", signal.ticker)
             return submit_short_whole_share(client, signal, notional)

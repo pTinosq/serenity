@@ -73,6 +73,7 @@ trades are skipped); `sentiment` is the *sizer*. Returns a
 - `SKIPPED_LOW_CONFIDENCE` — `confidence < MIN_CONFIDENCE`.
 - `SKIPPED_BELOW_MIN_TRADE` — sized below `MIN_TRADE_USD`.
 - `SKIPPED_PRICE_TOO_HIGH` — opening a short but one share costs more than the sized notional (see below).
+- `SKIPPED_NOT_TRADEABLE` — Alpaca returned 40010001 ("asset not active" / "not found"). Most often the Oracle extracted a foreign-listed ticker that happened to be cashtagged like a US one (e.g. `$SIVE` is Sivers Semiconductors on Nasdaq Stockholm).
 - `SKIPPED_NO_CASH` — Alpaca cash balance below `MIN_TRADE_USD`.
 - `SKIPPED_NO_CREDENTIALS` — Alpaca keys not set; rest of pipeline runs.
 - `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
