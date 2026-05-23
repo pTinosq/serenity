@@ -228,6 +228,7 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
                 reason="not_tradeable",
                 title=f"{signal.ticker} not tradeable on Alpaca",
                 signal=signal,
+                amount=notional,
                 detail=(
                     "Alpaca rejected this ticker as inactive. Most often it's "
                     "a foreign listing (e.g. Nasdaq Stockholm) the Oracle "
