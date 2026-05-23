@@ -1,6 +1,7 @@
 import argparse
 import logging
 
+from serenity.alerts import notify_crash
 from serenity.config import load_settings
 from serenity.logging_config import setup_logging
 from serenity.oracle.oracle import Oracle, OracleError
@@ -22,23 +23,35 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def start_bot() -> None:
-    """Stream tweets → Oracle → Trading."""
-    log.info("Starting [bold cyan]serenity[/] :sparkles:")
-    settings = load_settings()
-    oracle = Oracle(settings=settings)
+    """Stream tweets → Oracle → Trading.
 
-    for tweet in stream_tweets(settings):
-        log.info("Tweet: %s", tweet[:120].replace("\n", " "))
-        try:
-            signal = oracle.analyze(tweet)
-        except OracleError:
-            log.exception("Oracle failed on tweet")
-            continue
-        log.info("Signal: %s", signal.model_dump())
-        try:
-            execute_trade(signal, settings, tweet=tweet)
-        except TradingError:
-            log.exception("Trading failed for signal")
+    Per-tweet failures (Oracle parse errors, Alpaca rejections) are
+    logged and the loop continues. Anything else — credit exhaustion,
+    revoked tokens, upstream outages — propagates here, where we fire
+    a system alert before letting the process die so Railway can
+    restart us.
+    """
+    log.info("Starting [bold cyan]serenity[/] :sparkles:")
+    try:
+        settings = load_settings()
+        oracle = Oracle(settings=settings)
+
+        for tweet in stream_tweets(settings):
+            log.info("Tweet: %s", tweet[:120].replace("\n", " "))
+            try:
+                signal = oracle.analyze(tweet)
+            except OracleError:
+                log.exception("Oracle failed on tweet")
+                continue
+            log.info("Signal: %s", signal.model_dump())
+            try:
+                execute_trade(signal, settings, tweet=tweet)
+            except TradingError:
+                log.exception("Trading failed for signal")
+    except Exception as exc:
+        log.exception("Bot loop crashed")
+        notify_crash(exc, where="bot loop")
+        raise
 
 
 def main() -> None:
