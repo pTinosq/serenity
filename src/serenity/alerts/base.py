@@ -16,12 +16,12 @@ from serenity.oracle.models import TradeSignal
 
 @dataclass
 class Alert:
-    reason: str                  # short tag, e.g. "not_tradeable"
-    title: str                   # one-line headline shown to the user
-    signal: TradeSignal          # the trade signal that prompted the alert
-    detail: str = ""             # optional extra context
-    amount: float | None = None  # sized notional in USD, if known
-    tweet: str | None = None     # source tweet/text that produced the signal
+    reason: str                          # short tag, e.g. "not_tradeable"
+    title: str                           # one-line headline shown to the user
+    detail: str = ""                     # optional extra context / body / traceback
+    signal: TradeSignal | None = None    # signal that prompted the alert, if any
+    amount: float | None = None          # sized notional in USD, if known
+    tweet: str | None = None             # source tweet/text that produced the signal
 
 
 class AlertChannel(Protocol):

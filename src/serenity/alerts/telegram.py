@@ -73,20 +73,20 @@ class TelegramChannel:
 
 
 def format_message(alert: Alert) -> str:
-    sig = alert.signal
-    parts = [
-        f"<b>⚠ {html.escape(alert.title)}</b>",
-        "",
-        f"<b>Ticker:</b> <code>{html.escape(sig.ticker)}</code>",
-        f"<b>Action:</b> {html.escape(sig.order_type)}",
-    ]
-    if alert.amount is not None:
-        parts.append(f"<b>Amount:</b> ${alert.amount:.2f}")
-    parts += [
-        f"<b>Confidence:</b> {sig.confidence:.2f}",
-        f"<b>Sentiment:</b> {sig.sentiment:.2f}",
-        f"<b>Reason:</b> <code>{html.escape(alert.reason)}</code>",
-    ]
+    parts = [f"<b>⚠ {html.escape(alert.title)}</b>", ""]
+    if alert.signal is not None:
+        sig = alert.signal
+        parts += [
+            f"<b>Ticker:</b> <code>{html.escape(sig.ticker)}</code>",
+            f"<b>Action:</b> {html.escape(sig.order_type)}",
+        ]
+        if alert.amount is not None:
+            parts.append(f"<b>Amount:</b> ${alert.amount:.2f}")
+        parts += [
+            f"<b>Confidence:</b> {sig.confidence:.2f}",
+            f"<b>Sentiment:</b> {sig.sentiment:.2f}",
+        ]
+    parts.append(f"<b>Reason:</b> <code>{html.escape(alert.reason)}</code>")
     if alert.tweet:
         parts += ["", "<b>Tweet:</b>", f"<blockquote>{html.escape(alert.tweet)}</blockquote>"]
     if alert.detail:
