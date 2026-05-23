@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     alpaca_secret_key: SecretStr | None = None
     alpaca_paper: bool = True
 
+    telegram_bot_token: SecretStr | None = None
+    telegram_chat_id: str | None = None
+
 
 def load_settings() -> Settings:
     return Settings()
