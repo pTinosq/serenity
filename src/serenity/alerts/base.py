@@ -16,10 +16,11 @@ from serenity.oracle.models import TradeSignal
 
 @dataclass
 class Alert:
-    reason: str          # short tag, e.g. "not_tradeable"
-    title: str           # one-line headline shown to the user
-    signal: TradeSignal  # the trade signal that prompted the alert
-    detail: str = ""     # optional extra context
+    reason: str                  # short tag, e.g. "not_tradeable"
+    title: str                   # one-line headline shown to the user
+    signal: TradeSignal          # the trade signal that prompted the alert
+    detail: str = ""             # optional extra context
+    amount: float | None = None  # sized notional in USD, if known
 
 
 class AlertChannel(Protocol):

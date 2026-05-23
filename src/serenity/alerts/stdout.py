@@ -13,11 +13,14 @@ class StdoutChannel:
 
     def send(self, alert: Alert) -> None:
         sig = alert.signal
+        headline = f"[cyan]{sig.order_type} {sig.ticker}[/]"
+        if alert.amount is not None:
+            headline += f"  [green]${alert.amount:.2f}[/]"
+        headline += f"  conf {sig.confidence:.2f}  sent {sig.sentiment:.2f}"
         lines = [
             f"[bold]{alert.title}[/]",
             "",
-            f"[cyan]{sig.order_type} {sig.ticker}[/]  "
-            f"conf {sig.confidence:.2f}  sent {sig.sentiment:.2f}",
+            headline,
         ]
         if alert.detail:
             lines.append("")
