@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.7
-
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 
 ENV UV_COMPILE_BYTECODE=1 \
@@ -8,13 +6,11 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 WORKDIR /app
 
-RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    uv sync --frozen --no-install-project --no-dev
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev
 
-COPY pyproject.toml uv.lock README.md ./
+COPY README.md ./
 COPY src ./src
-
 RUN uv sync --frozen --no-dev
 
 
