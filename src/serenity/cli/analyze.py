@@ -70,7 +70,7 @@ def main() -> None:
             continue
 
         try:
-            outcome = execute_trade(signal, settings)
+            outcome = execute_trade(signal, settings, tweet=text)
         except TradingError as e:
             rprint(f"[red]Trading failed:[/] {e}")
             continue
