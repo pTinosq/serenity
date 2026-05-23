@@ -1,8 +1,8 @@
-"""Alert dispatch — fans an Alert out to every active channel.
+"""Alert dispatch — fans an Alert out to the active channel(s).
 
-Channel selection is hard-coded to stdout for now. As telegram /
-discord / etc. land, `active_channels` will check settings and
-include them when the relevant credentials are configured.
+The active channel is picked from `ALERT_FALLBACK_CHANNEL`. If
+`telegram` is selected but its credentials are missing, we fall back
+to stdout with a warning so alerts are never silently dropped.
 """
 
 from __future__ import annotations
@@ -11,11 +11,22 @@ import logging
 
 from serenity.alerts.base import Alert, AlertChannel
 from serenity.alerts.stdout import StdoutChannel
+from serenity.alerts.telegram import TelegramChannel
+from serenity.config import load_settings
 
 log = logging.getLogger(__name__)
 
 
 def active_channels() -> list[AlertChannel]:
+    settings = load_settings()
+    if settings.alert_fallback_channel == "telegram":
+        telegram = TelegramChannel.from_settings(settings)
+        if telegram is not None:
+            return [telegram]
+        log.warning(
+            "ALERT_FALLBACK_CHANNEL=telegram but TELEGRAM_BOT_TOKEN / "
+            "TELEGRAM_CHAT_ID are not set — falling back to stdout"
+        )
     return [StdoutChannel()]
 
 
