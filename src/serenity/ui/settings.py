@@ -27,9 +27,18 @@ FIELDS: list[tuple[str, str]] = [
     ("alpaca_api_key", "ALPACA_API_KEY"),
     ("alpaca_secret_key", "ALPACA_SECRET_KEY"),
     ("alpaca_paper", "ALPACA_PAPER"),
+    ("alert_fallback_channel", "ALERT_FALLBACK_CHANNEL"),
+    ("telegram_bot_token", "TELEGRAM_BOT_TOKEN"),
+    ("telegram_chat_id", "TELEGRAM_CHAT_ID"),
 ]
 
-SECRET_FIELDS = {"openrouter_api_key", "x_bearer_token", "alpaca_api_key", "alpaca_secret_key"}
+SECRET_FIELDS = {
+    "openrouter_api_key",
+    "x_bearer_token",
+    "alpaca_api_key",
+    "alpaca_secret_key",
+    "telegram_bot_token",
+}
 
 KEY_COL = max(len(env_var) for _, env_var in FIELDS)
 BACK = "← Back"
