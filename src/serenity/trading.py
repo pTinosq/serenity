@@ -157,8 +157,16 @@ def submit_short_whole_share(
     return TradeOutcome.EXECUTED
 
 
-def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
-    """Submit a market order for `signal`, or skip with a reason."""
+def execute_trade(
+    signal: TradeSignal,
+    settings: Settings,
+    tweet: str | None = None,
+) -> TradeOutcome:
+    """Submit a market order for `signal`, or skip with a reason.
+
+    `tweet` is the source text the signal came from; when supplied it's
+    attached to any fallback alert so the user has the original context.
+    """
     if signal.order_type == "N/A":
         log.info("Skipping: no actionable signal")
         return TradeOutcome.SKIPPED_NO_SIGNAL
@@ -229,6 +237,7 @@ def execute_trade(signal: TradeSignal, settings: Settings) -> TradeOutcome:
                 title=f"{signal.ticker} not tradeable on Alpaca",
                 signal=signal,
                 amount=notional,
+                tweet=tweet,
                 detail=(
                     "Alpaca rejected this ticker as inactive. Most often it's "
                     "a foreign listing (e.g. Nasdaq Stockholm) the Oracle "
