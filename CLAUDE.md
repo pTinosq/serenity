@@ -113,10 +113,19 @@ strong signal on a non-US ticker, etc.). One file per channel.
 Currently shipped:
 
 - `stdout.py` — rich panel printed to the terminal.
+- `telegram.py` — message via the Telegram Bot API
+  (`sendMessage`, HTML parse mode, stdlib `urllib`).
 
-Future channels (telegram, discord, ...) drop in as new files and get
-listed in `dispatcher.active_channels()` once their credentials are
-configured. Call site:
+Channel selection is single-pick via `ALERT_FALLBACK_CHANNEL`
+(`stdout` | `telegram`, default `stdout`). The dispatcher reads the
+setting on each `dispatch()` call and routes to the selected channel.
+If `telegram` is selected but `TELEGRAM_BOT_TOKEN` /
+`TELEGRAM_CHAT_ID` are unset, the dispatcher logs a warning and falls
+back to stdout — alerts are never silently dropped. Per-channel
+exceptions are caught so a broken channel can't crash the trading
+loop.
+
+Call site:
 
 ```python
 from serenity.alerts import Alert, dispatch
