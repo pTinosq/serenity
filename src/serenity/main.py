@@ -36,7 +36,7 @@ def start_bot() -> None:
             continue
         log.info("Signal: %s", signal.model_dump())
         try:
-            execute_trade(signal, settings)
+            execute_trade(signal, settings, tweet=tweet)
         except TradingError:
             log.exception("Trading failed for signal")
 
