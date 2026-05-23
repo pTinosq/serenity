@@ -22,6 +22,9 @@ class StdoutChannel:
             "",
             headline,
         ]
+        if alert.tweet:
+            lines.append("")
+            lines.append(f"[dim italic]“{alert.tweet}”[/]")
         if alert.detail:
             lines.append("")
             lines.append(f"[dim]{alert.detail}[/]")

@@ -87,6 +87,8 @@ def format_message(alert: Alert) -> str:
         f"<b>Sentiment:</b> {sig.sentiment:.2f}",
         f"<b>Reason:</b> <code>{html.escape(alert.reason)}</code>",
     ]
+    if alert.tweet:
+        parts += ["", "<b>Tweet:</b>", f"<blockquote>{html.escape(alert.tweet)}</blockquote>"]
     if alert.detail:
         parts += ["", html.escape(alert.detail)]
     return "\n".join(parts)

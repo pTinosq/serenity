@@ -21,6 +21,7 @@ class Alert:
     signal: TradeSignal          # the trade signal that prompted the alert
     detail: str = ""             # optional extra context
     amount: float | None = None  # sized notional in USD, if known
+    tweet: str | None = None     # source tweet/text that produced the signal
 
 
 class AlertChannel(Protocol):
