@@ -2,6 +2,7 @@ import argparse
 import logging
 
 from serenity.alerts import notify_crash
+from serenity.alerts.scheduler import start_daily_scheduler
 from serenity.config import load_settings
 from serenity.logging_config import setup_logging
 from serenity.oracle.oracle import Oracle, OracleError
@@ -35,6 +36,9 @@ def start_bot() -> None:
     try:
         settings = load_settings()
         oracle = Oracle(settings=settings)
+
+        if settings.message_frequency == "daily":
+            start_daily_scheduler(settings.daily_message_delivery_utc)
 
         for tweet in stream_tweets(settings):
             log.info("Tweet: %s", tweet[:120].replace("\n", " "))
