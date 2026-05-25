@@ -1,8 +1,7 @@
-from datetime import time as time_cls
 from typing import Annotated, Literal
 
 from annotated_types import Ge, Le
-from pydantic import HttpUrl, SecretStr, field_validator
+from pydantic import HttpUrl, SecretStr, StringConstraints
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -37,18 +36,9 @@ class Settings(BaseSettings):
     telegram_chat_id: str | None = None
 
     message_frequency: Literal["per-tweet", "daily"] = "per-tweet"
-    daily_message_delivery_utc: str = "21:30"
-
-    @field_validator("daily_message_delivery_utc")
-    @classmethod
-    def validate_delivery_time(cls, v: str) -> str:
-        try:
-            time_cls.fromisoformat(v)
-        except ValueError as e:
-            raise ValueError(
-                f"DAILY_MESSAGE_DELIVERY_UTC must be HH:MM (24h, UTC); got {v!r}"
-            ) from e
-        return v
+    daily_message_delivery_utc: Annotated[
+        str, StringConstraints(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    ] = "21:30"
 
 
 def load_settings() -> Settings:
