@@ -135,6 +135,30 @@ dispatch(Alert(reason="not_tradeable", title=..., signal=signal, detail=...))
 The dispatcher swallows per-channel errors so a broken telegram bot
 won't silence stdout.
 
+### Message frequency
+
+`MESSAGE_FREQUENCY` controls delivery cadence:
+
+- `per-tweet` (default) — every `Messenger.send(Alert(...))` is
+  delivered immediately. Noisy when the tracked account tweets a lot.
+- `daily` — `Alert` payloads are appended to a persistent JSONL
+  buffer at `data/event_log.jsonl`. A daemon scheduler thread
+  (`alerts/scheduler.py`) wakes once per day at
+  `DAILY_MESSAGE_DELIVERY_UTC` (HH:MM UTC, default `21:30`), calls
+  `flush_daily_summary()`, which drains the buffer and asks the
+  active channel to `render_summary(events)`. Channels own their own
+  summary format (Stdout uses a Rich panel; Telegram uses uppercase
+  reason headers + bulleted lines).
+
+Out-of-band messages bypass the buffer even in daily mode:
+plain-string `dispatch("...")` calls go straight to the channel,
+and `notify_crash()` passes `force=True` so a fatal error message
+ships immediately rather than waiting until the next slot.
+
+The JSONL buffer is crash-resilient: Railway redeploys mid-day
+don't drop events. The fresh instance picks up the existing log and
+the scheduler delivers normally.
+
 ## Entry points
 
 `serenity` (no args) opens an interactive menu (Start / Settings /
