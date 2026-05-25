@@ -45,7 +45,7 @@ The system prompt lives at `oracle/prompt.md` and is loaded via
 `Path(__file__).parent / "prompt.md"`. The OpenRouter client is a
 process-wide singleton via `functools.lru_cache(maxsize=1)`. Model id
 is configurable via `SENTIMENT_MODEL` and uses OpenRouter's
-`provider/model` format (e.g. `openai/gpt-5.4-nano`). Structured
+`provider/model` format (e.g. `google/gemini-2.5-flash`). Structured
 output is enforced via `response_format={"type": "json_schema", ...}`
 with `strict: true` and the schema is derived from `TradeSignal`.
 

@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     log_level: LogLevel = "INFO"
 
     openrouter_api_key: SecretStr
-    sentiment_model: str = "openai/gpt-5.4-nano"
+    sentiment_model: str = "google/gemini-2.5-flash"
 
     tracked_x_account: HttpUrl
     x_bearer_token: SecretStr
