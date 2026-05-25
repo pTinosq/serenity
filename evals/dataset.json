@@ -55,7 +55,7 @@
       "ticker": "SIVE",
       "order_type": "BUY",
       "confidence": {
-        "gte": 0.75
+        "gte": 0.7
       }
     }
   },
