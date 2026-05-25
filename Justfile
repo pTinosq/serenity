@@ -19,6 +19,10 @@ start:
 install:
     uv sync
 
+# Interactive .env wizard — walks you through the minimum config
+init:
+    uv run python -m serenity.cli.init
+
 # Run the Oracle REPL (interactive LLM signal extractor)
 oracle:
     uv run python -m serenity.cli.analyze
