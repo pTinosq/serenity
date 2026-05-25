@@ -76,13 +76,12 @@ def dispatch(message: object, *, force: bool = False) -> None:
 def flush_daily_summary() -> None:
     """Drain the event buffer and deliver one summary per active channel.
 
-    Idempotent on an empty buffer. Per-channel render or send failures
-    are logged and don't block other channels.
+    Empty buffer still delivers — a daily heartbeat tells the user the
+    bot is alive on quiet days; silence is ambiguous (no news vs. dead
+    process). Channels render their own "no events" message. Per-channel
+    render or send failures are logged and don't block other channels.
     """
     events = default_log().drain()
-    if not events:
-        log.info("Daily summary: no events to report")
-        return
 
     for channel in active_channels():
         try:
