@@ -27,7 +27,7 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.enums import OrderSide, TimeInForce
 from alpaca.trading.requests import MarketOrderRequest
 
-from serenity.alerts import Alert, dispatch
+from serenity.alerts import Alert, Messenger
 from serenity.config import Settings, load_settings
 from serenity.oracle.models import TradeSignal
 
@@ -113,6 +113,7 @@ def submit_short_whole_share(
     client: TradingClient,
     signal: TradeSignal,
     notional: float,
+    tweet: str | None = None,
 ) -> TradeOutcome:
     """Open a short with whole-share qty, sized from the latest trade price."""
     try:
@@ -154,6 +155,13 @@ def submit_short_whole_share(
         signal.sentiment,
         order.status,
     )
+    Messenger.send(Alert(
+        reason="trade_executed",
+        title=f"Shorted {qty} {signal.ticker} @ ~${price:.2f} (≈${qty * price:.2f})",
+        signal=signal,
+        amount=qty * price,
+        tweet=tweet,
+    ))
     return TradeOutcome.EXECUTED
 
 
@@ -232,7 +240,7 @@ def execute_trade(
                 "or delisted ticker the Oracle misidentified as US-listed)",
                 signal.ticker,
             )
-            dispatch(Alert(
+            Messenger.send(Alert(
                 reason="not_tradeable",
                 title=f"{signal.ticker} not tradeable on Alpaca",
                 signal=signal,
@@ -248,7 +256,7 @@ def execute_trade(
             return TradeOutcome.SKIPPED_NOT_TRADEABLE
         if is_fractional_short_rejection(e, side):
             log.info("Retrying %s SELL as whole-share short", signal.ticker)
-            return submit_short_whole_share(client, signal, notional)
+            return submit_short_whole_share(client, signal, notional, tweet=tweet)
         raise TradingError(f"Alpaca rejected {side.value} {signal.ticker}: {e}") from e
 
     log.info(
@@ -261,4 +269,11 @@ def execute_trade(
         cash,
         order.status,
     )
+    Messenger.send(Alert(
+        reason="trade_executed",
+        title=f"{side.value} ${notional:.2f} {signal.ticker}",
+        signal=signal,
+        amount=notional,
+        tweet=tweet,
+    ))
     return TradeOutcome.EXECUTED
