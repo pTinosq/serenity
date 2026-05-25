@@ -1,8 +1,8 @@
 """Telegram alert channel.
 
-Sends a single message per alert via the Bot API's `sendMessage`
-endpoint. Uses HTML parse mode so we get bold/mono formatting without
-worrying about MarkdownV2's exhaustive escape rules.
+Sends a single message per call via the Bot API's `sendMessage`
+endpoint. We don't set a parse_mode — the text we receive is treated
+as-is, so callers don't have to think about HTML/Markdown escaping.
 
 Setup:
 1. Create a bot via @BotFather, copy the token into TELEGRAM_BOT_TOKEN.
@@ -13,13 +13,11 @@ Setup:
 
 from __future__ import annotations
 
-import html
 import json
 import logging
 from urllib import request
 from urllib.error import URLError
 
-from serenity.alerts.base import Alert
 from serenity.config import Settings
 
 log = logging.getLogger(__name__)
@@ -44,12 +42,10 @@ class TelegramChannel:
             chat_id=settings.telegram_chat_id,
         )
 
-    def send(self, alert: Alert) -> None:
-        text = format_message(alert)
+    def send(self, text: str) -> None:
         payload = json.dumps({
             "chat_id": self.chat_id,
             "text": text,
-            "parse_mode": "HTML",
             "disable_web_page_preview": True,
         }).encode("utf-8")
 
@@ -70,25 +66,3 @@ class TelegramChannel:
             raise RuntimeError(
                 f"Telegram API rejected message: {result.get('description', body)}"
             )
-
-
-def format_message(alert: Alert) -> str:
-    parts = [f"<b>⚠ {html.escape(alert.title)}</b>", ""]
-    if alert.signal is not None:
-        sig = alert.signal
-        parts += [
-            f"<b>Ticker:</b> <code>{html.escape(sig.ticker)}</code>",
-            f"<b>Action:</b> {html.escape(sig.order_type)}",
-        ]
-        if alert.amount is not None:
-            parts.append(f"<b>Amount:</b> ${alert.amount:.2f}")
-        parts += [
-            f"<b>Confidence:</b> {sig.confidence:.2f}",
-            f"<b>Sentiment:</b> {sig.sentiment:.2f}",
-        ]
-    parts.append(f"<b>Reason:</b> <code>{html.escape(alert.reason)}</code>")
-    if alert.tweet:
-        parts += ["", "<b>Tweet:</b>", f"<blockquote>{html.escape(alert.tweet)}</blockquote>"]
-    if alert.detail:
-        parts += ["", html.escape(alert.detail)]
-    return "\n".join(parts)
