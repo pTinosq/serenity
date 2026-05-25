@@ -170,3 +170,16 @@ right action but the wrong ticker is still useless.
   Both auto-load `.env` (`set dotenv-load := true`).
 - Single console-script entry point: `serenity = "serenity.main:main"`.
 - src-layout package under `src/serenity/`.
+
+## Workflow
+
+All code changes ship via pull requests, never direct commits to `main`:
+
+1. Make the requested changes on a feature branch.
+2. Commit incrementally as you go — multiple small, logically scoped
+   commits, not one big dump at the end. Each commit should stand on
+   its own (one concern per commit).
+3. When the change is complete, push the branch and open a PR.
+4. **Never merge a PR.** The user reviews and merges; they may iterate
+   with you on the branch first. Do not run `gh pr merge` even if the
+   PR looks ready.
