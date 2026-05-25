@@ -14,3 +14,6 @@ wheels/
 .DS_Store
 .idea/
 .vscode/
+
+# Runtime state
+data/

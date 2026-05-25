@@ -15,9 +15,11 @@ from __future__ import annotations
 
 import json
 import logging
+from collections import defaultdict
 from urllib import request
 from urllib.error import URLError
 
+from serenity.alerts.base import Event
 from serenity.config import Settings
 
 log = logging.getLogger(__name__)
@@ -66,3 +68,29 @@ class TelegramChannel:
             raise RuntimeError(
                 f"Telegram API rejected message: {result.get('description', body)}"
             )
+
+    def render_summary(self, events: list[Event]) -> str:
+        """Tight plain-text summary tuned for the Telegram client.
+
+        Telegram renders newlines well but doesn't have a panel/border,
+        so this format leans on uppercase reason headers and indentation
+        rather than visual separators.
+        """
+        if not events:
+            return "Daily summary — no events to report."
+
+        day = events[0].timestamp.strftime("%Y-%m-%d")
+        lines = [f"DAILY SUMMARY — {day}", f"{len(events)} event(s)"]
+
+        groups: dict[str, list[Event]] = defaultdict(list)
+        for e in events:
+            groups[e.alert.reason].append(e)
+
+        for reason, items in groups.items():
+            lines.append("")
+            lines.append(f"{reason.upper().replace('_', ' ')} ({len(items)})")
+            for e in items:
+                t = e.timestamp.strftime("%H:%M")
+                lines.append(f"  • {t}  {e.alert.title}")
+
+        return "\n".join(lines)

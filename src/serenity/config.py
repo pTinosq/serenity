@@ -1,7 +1,7 @@
 from typing import Annotated, Literal
 
 from annotated_types import Ge, Le
-from pydantic import HttpUrl, SecretStr
+from pydantic import HttpUrl, SecretStr, StringConstraints
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     alert_fallback_channel: Literal["stdout", "telegram"] = "stdout"
     telegram_bot_token: SecretStr | None = None
     telegram_chat_id: str | None = None
+
+    message_frequency: Literal["per-tweet", "daily"] = "per-tweet"
+    daily_message_delivery_utc: Annotated[
+        str, StringConstraints(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    ] = "21:30"
 
 
 def load_settings() -> Settings:
