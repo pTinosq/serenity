@@ -5,7 +5,7 @@
       "ticker": "AAPL",
       "order_type": "BUY",
       "confidence": {
-        "gt": 0.6
+        "gte": 0.6
       }
     }
   },
@@ -15,7 +15,7 @@
       "ticker": "SIVE",
       "order_type": "BUY",
       "confidence": {
-        "gt": 0.88
+        "gte": 0.88
       }
     }
   },
@@ -35,7 +35,7 @@
       "ticker": "POET",
       "order_type": "SELL",
       "confidence": {
-        "gt": 0.8
+        "gte": 0.8
       }
     }
   },
@@ -45,7 +45,7 @@
       "ticker": "BOT",
       "order_type": "SELL",
       "confidence": {
-        "gt": 0.7
+        "gte": 0.7
       }
     }
   },
@@ -55,7 +55,7 @@
       "ticker": "SIVE",
       "order_type": "BUY",
       "confidence": {
-        "gt": 0.75
+        "gte": 0.75
       }
     }
   },
@@ -65,7 +65,7 @@
       "ticker": "SIVE",
       "order_type": "BUY",
       "confidence": {
-        "gt": 0.9
+        "gte": 0.9
       }
     }
   },
@@ -75,7 +75,7 @@
       "ticker": "POET",
       "order_type": "SELL",
       "confidence": {
-        "gt": 0.9
+        "gte": 0.8
       }
     }
   },
@@ -95,7 +95,7 @@
       "ticker": "NBIS",
       "order_type": "BUY",
       "confidence": {
-        "gt": 0.85
+        "gte": 0.85
       }
     }
   },

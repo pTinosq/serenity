@@ -8,7 +8,7 @@ at `evals/dataset.json` and is shaped as a list of:
       "result": {
         "ticker": "NVDA" | "N/A",
         "order_type": "BUY" | "SELL" | "N/A",
-        "confidence": {"gt": 0.7, "lt": 1.0, "eq": null}
+        "confidence": {"gte": 0.7, "lte": 1.0, "eq": null}
       }
     }
 
@@ -46,14 +46,14 @@ WEIGHT_CONFIDENCE = 0.1
 
 
 class ConfidenceCondition(BaseModel):
-    gt: float | None = None
-    lt: float | None = None
+    gte: float | None = None
+    lte: float | None = None
     eq: float | None = None
 
     def matches(self, actual: float) -> bool:
-        if self.gt is not None and not actual > self.gt:
+        if self.gte is not None and not actual >= self.gte:
             return False
-        if self.lt is not None and not actual < self.lt:
+        if self.lte is not None and not actual <= self.lte:
             return False
         if self.eq is not None and actual != self.eq:
             return False
@@ -61,10 +61,10 @@ class ConfidenceCondition(BaseModel):
 
     def describe(self) -> str:
         parts = []
-        if self.gt is not None:
-            parts.append(f"gt {self.gt}")
-        if self.lt is not None:
-            parts.append(f"lt {self.lt}")
+        if self.gte is not None:
+            parts.append(f"gte {self.gte}")
+        if self.lte is not None:
+            parts.append(f"lte {self.lte}")
         if self.eq is not None:
             parts.append(f"eq {self.eq}")
         return " & ".join(parts) if parts else "any"
