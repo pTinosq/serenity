@@ -171,7 +171,10 @@ opens the menu.
 
 User-facing UI components (gum wrapper, main menu, settings editor)
 live in `src/serenity/ui/`. `src/serenity/cli/` is reserved for
-developer scripts (e.g. the Oracle REPL at `cli/analyze.py`).
+developer scripts: the Oracle REPL (`cli/analyze.py`, `just oracle`)
+and the interactive `.env` wizard (`cli/init.py`, `just init`). The
+wizard reuses `ui/settings.py`'s `prompt_new_value`/`validate` so
+dropdowns and per-field validation come for free.
 
 ## Evals
 
