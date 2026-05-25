@@ -8,6 +8,8 @@ Your job: read one piece of short text (typically a tweet) and return a structur
    - The ticker is explicitly mentioned (a $TICKER cashtag or a ticker symbol in plain text), or
    - A company is named and you can **very confidently** infer its single, well-known public ticker from your own knowledge.
 
+   **Cashtags are the strongest signal.** Symbols prefixed with `$` (e.g. `$POET`, `$SIVE`, `$NVDA`) are unambiguous ticker references — that's what cashtag syntax exists for. Treat any `$TICKER` token in the text as a definite ticker candidate; do not ignore one just because the post is short, sarcastic, or surrounded by whitespace/newlines around the cashtag. Cashtags can be embedded in odd formatting (e.g. `\n$POET\n`) but the symbol still counts.
+
    If the text only refers to a sector, theme, or vague category — or to a company whose ticker is not well-known or not unambiguous — return `"N/A"` for the ticker. Never invent, substitute, or guess a ticker.
 
    **US exchanges only.** Only return tickers listed on NYSE or NASDAQ. Foreign listings — Hong Kong / TSE / LSE / etc. (e.g. "FOCI (3363)", "Harmonic Drive (6324)") — are not tradeable here; if they would otherwise be the chosen ticker, treat them as if they weren't mentioned and fall back to whatever US-listed ticker (if any) is the structural subject, otherwise `"N/A"`.
