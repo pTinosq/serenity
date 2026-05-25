@@ -6,6 +6,13 @@ to stdout with a warning so messages are never silently dropped.
 
 `dispatch` accepts a plain `str` (or anything with a sensible
 `__str__`, like an `Alert`). Channels only ever see the final string.
+
+Frequency policy lives here too: when MESSAGE_FREQUENCY=daily,
+Alert messages are appended to the EventLog instead of going out
+immediately. The scheduler calls `flush_daily_summary` at the
+configured time to drain and deliver. Plain strings and `force=True`
+calls (crashes) always go out immediately — out-of-band stuff
+shouldn't get summarized.
 """
 
 from __future__ import annotations
@@ -14,6 +21,7 @@ import logging
 import traceback
 
 from serenity.alerts.base import Alert, AlertChannel
+from serenity.alerts.event_log import default_log
 from serenity.alerts.stdout import StdoutChannel
 from serenity.alerts.telegram import TelegramChannel
 from serenity.config import load_settings
@@ -37,9 +45,26 @@ def active_channels() -> list[AlertChannel]:
     return [StdoutChannel()]
 
 
-def dispatch(message: object) -> None:
-    """Send `message` (a string, Alert, or anything with __str__) to every
-    active channel. Per-channel errors are logged but never raised."""
+def dispatch(message: object, *, force: bool = False) -> None:
+    """Send `message` to every active channel.
+
+    `message` may be a string, an `Alert`, or anything with `__str__`.
+    Per-channel errors are logged but never raised.
+
+    If MESSAGE_FREQUENCY=daily and `message` is an `Alert`, the alert
+    is buffered to the EventLog instead of being delivered now —
+    unless `force=True` (used for out-of-band notices like crashes).
+    Plain strings always go out immediately.
+    """
+    settings = load_settings()
+    if (
+        not force
+        and isinstance(message, Alert)
+        and settings.message_frequency == "daily"
+    ):
+        default_log().append(message)
+        return
+
     text = str(message)
     for channel in active_channels():
         try:
@@ -48,11 +73,31 @@ def dispatch(message: object) -> None:
             log.exception("Channel %s failed", channel.name)
 
 
+def flush_daily_summary() -> None:
+    """Drain the event buffer and deliver one summary per active channel.
+
+    Idempotent on an empty buffer. Per-channel render or send failures
+    are logged and don't block other channels.
+    """
+    events = default_log().drain()
+    if not events:
+        log.info("Daily summary: no events to report")
+        return
+
+    for channel in active_channels():
+        try:
+            text = channel.render_summary(events)
+            channel.send(text)
+        except Exception:
+            log.exception("Channel %s failed during daily summary", channel.name)
+
+
 def notify_crash(exc: BaseException, *, where: str = "bot") -> None:
     """Best-effort: dispatch a system message about a crash. Never raises.
 
     Suitable as the last call before the process dies, so the user knows
-    Railway (or whatever host) is about to restart / give up.
+    Railway (or whatever host) is about to restart / give up. Bypasses
+    the daily buffer — a crash notice you'd see tomorrow is useless.
     """
     tb = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
     # Keep the tail — that's where the actual error lives.
@@ -63,6 +108,6 @@ def notify_crash(exc: BaseException, *, where: str = "bot") -> None:
         detail=detail,
     )
     try:
-        dispatch(alert)
+        dispatch(alert, force=True)
     except Exception:
         log.exception("notify_crash failed to dispatch")
