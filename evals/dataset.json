@@ -108,5 +108,15 @@
         "eq": 0.0
       }
     }
+  },
+  {
+    "tweet": "$LPK turned out pretty well [image]",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0.0
+      }
+    }
   }
 ]
