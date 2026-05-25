@@ -8,7 +8,7 @@ from rich import print as rprint
 from rich.markup import escape
 from rich.panel import Panel
 
-from serenity.alerts.event_log import Event
+from serenity.alerts.base import Event
 
 
 class StdoutChannel:

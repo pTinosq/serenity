@@ -19,7 +19,7 @@ from collections import defaultdict
 from urllib import request
 from urllib.error import URLError
 
-from serenity.alerts.event_log import Event
+from serenity.alerts.base import Event
 from serenity.config import Settings
 
 log = logging.getLogger(__name__)

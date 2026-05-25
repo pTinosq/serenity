@@ -17,24 +17,15 @@ from __future__ import annotations
 import json
 import logging
 import threading
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from serenity.alerts.base import Alert
+from serenity.alerts.base import Alert, Event
 from serenity.oracle.models import TradeSignal
 
 log = logging.getLogger(__name__)
 
 DEFAULT_PATH = Path("data") / "event_log.jsonl"
-
-
-@dataclass
-class Event:
-    """A timestamped alert as recorded in the event log."""
-
-    timestamp: datetime
-    alert: Alert
 
 
 class EventLog:

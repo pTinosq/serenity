@@ -10,12 +10,10 @@ string instead.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol
+from datetime import datetime
+from typing import Protocol
 
 from serenity.oracle.models import TradeSignal
-
-if TYPE_CHECKING:
-    from serenity.alerts.event_log import Event
 
 
 @dataclass
@@ -44,6 +42,21 @@ class Alert:
         return "\n".join(lines)
 
 
+@dataclass
+class Event:
+    """An `Alert` plus the UTC moment it was recorded.
+
+    Kept here next to `Alert` because both are alert-domain value
+    types — `Event` is what channels render in daily-summary mode
+    (`AlertChannel.render_summary` takes `list[Event]`). The persistent
+    JSONL buffer lives in `event_log.py`, but the shape of the data
+    belongs with the rest of the alert vocabulary.
+    """
+
+    timestamp: datetime
+    alert: Alert
+
+
 class AlertChannel(Protocol):
     """Surface a message through some medium. Implementations may raise
     on delivery failure; the dispatcher catches anything that escapes.
@@ -58,4 +71,4 @@ class AlertChannel(Protocol):
 
     def send(self, text: str) -> None: ...
 
-    def render_summary(self, events: list["Event"]) -> str: ...
+    def render_summary(self, events: list[Event]) -> str: ...
