@@ -10,9 +10,12 @@ string instead.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from serenity.oracle.models import TradeSignal
+
+if TYPE_CHECKING:
+    from serenity.alerts.event_log import Event
 
 
 @dataclass
@@ -43,8 +46,16 @@ class Alert:
 
 class AlertChannel(Protocol):
     """Surface a message through some medium. Implementations may raise
-    on delivery failure; the dispatcher catches anything that escapes."""
+    on delivery failure; the dispatcher catches anything that escapes.
+
+    `send` ships an already-formatted string. `render_summary` turns a
+    batch of buffered events (daily mode) into one such string —
+    formatting is per-channel because what looks good in a terminal
+    panel and what looks good on Telegram diverge.
+    """
 
     name: str
 
     def send(self, text: str) -> None: ...
+
+    def render_summary(self, events: list["Event"]) -> str: ...
