@@ -79,23 +79,34 @@ def run() -> None:
     existing = dotenv_values(ENV_FILE) if ENV_FILE.exists() else {}
     get = lambda k, d="": existing.get(k, d)  # noqa: E731
 
-    section("Step 1/4", "Required keys", "Without these the bot won't start.")
+    section("Step 1/5", "Required keys", "Without these the bot won't start.")
     ask("openrouter_api_key", "OPENROUTER_API_KEY", get("OPENROUTER_API_KEY"), required=True)
     ask("x_bearer_token", "X_BEARER_TOKEN", get("X_BEARER_TOKEN"), required=True)
     ask("tracked_x_account", "TRACKED_X_ACCOUNT", get("TRACKED_X_ACCOUNT"), required=True)
 
     section(
-        "Step 2/4",
-        "Trading",
-        "Alpaca is optional. Without it, the Twitter→Oracle pipeline still "
-        "runs and trades are skipped.",
+        "Step 2/5",
+        "Oracle & logging",
+        "Defaults work for most users. Hit Enter to keep them.",
     )
+    ask("sentiment_model", "SENTIMENT_MODEL", get("SENTIMENT_MODEL", "openai/gpt-5.4-nano"))
+    ask("log_level", "LOG_LEVEL", get("LOG_LEVEL", "INFO"))
+
+    section(
+        "Step 3/5",
+        "Trading",
+        "Per-trade sizing and (optional) Alpaca credentials. Notional is "
+        "sentiment * MAX, clamped to [MIN, MAX] and to available cash.",
+    )
+    ask("min_confidence", "MIN_CONFIDENCE", get("MIN_CONFIDENCE", "0.7"))
+    ask("min_trade_usd", "MIN_TRADE_USD", get("MIN_TRADE_USD", "10.0"))
+    ask("max_trade_usd", "MAX_TRADE_USD", get("MAX_TRADE_USD", "100.0"))
     if gum.confirm("Set up Alpaca credentials now?"):
         ask("alpaca_api_key", "ALPACA_API_KEY", get("ALPACA_API_KEY"), required=True)
         ask("alpaca_secret_key", "ALPACA_SECRET_KEY", get("ALPACA_SECRET_KEY"), required=True)
         ask("alpaca_paper", "ALPACA_PAPER", get("ALPACA_PAPER", "True"))
 
-    section("Step 3/4", "Alerts", "Where event notifications get delivered.")
+    section("Step 4/5", "Alerts", "Where event notifications get delivered.")
     channel = ask(
         "alert_fallback_channel",
         "ALERT_FALLBACK_CHANNEL",
@@ -114,7 +125,7 @@ def run() -> None:
         ask("telegram_bot_token", "TELEGRAM_BOT_TOKEN", get("TELEGRAM_BOT_TOKEN"), required=True)
         ask("telegram_chat_id", "TELEGRAM_CHAT_ID", get("TELEGRAM_CHAT_ID"), required=True)
 
-    section("Step 4/4", "Frequency", "How often the bot pings you.")
+    section("Step 5/5", "Frequency", "How often the bot pings you.")
     freq = ask(
         "message_frequency",
         "MESSAGE_FREQUENCY",
