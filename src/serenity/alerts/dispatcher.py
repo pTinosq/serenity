@@ -1,8 +1,11 @@
-"""Alert dispatch — fans an Alert out to the active channel(s).
+"""Dispatch — fans a message out to the active channel(s).
 
 The active channel is picked from `ALERT_FALLBACK_CHANNEL`. If
 `telegram` is selected but its credentials are missing, we fall back
-to stdout with a warning so alerts are never silently dropped.
+to stdout with a warning so messages are never silently dropped.
+
+`dispatch` accepts a plain `str` (or anything with a sensible
+`__str__`, like an `Alert`). Channels only ever see the final string.
 """
 
 from __future__ import annotations
@@ -17,9 +20,8 @@ from serenity.config import load_settings
 
 log = logging.getLogger(__name__)
 
-# Telegram caps messages at 4096 chars; leave headroom for the
-# title/reason wrapper and HTML tags.
-MAX_DETAIL_CHARS = 3500
+# Telegram caps messages at 4096 chars; leave headroom.
+MAX_MESSAGE_CHARS = 3500
 
 
 def active_channels() -> list[AlertChannel]:
@@ -35,25 +37,26 @@ def active_channels() -> list[AlertChannel]:
     return [StdoutChannel()]
 
 
-def dispatch(alert: Alert) -> None:
-    """Send `alert` to every active channel. Per-channel errors are logged
-    but never raised — one broken channel must not silence the others."""
+def dispatch(message: object) -> None:
+    """Send `message` (a string, Alert, or anything with __str__) to every
+    active channel. Per-channel errors are logged but never raised."""
+    text = str(message)
     for channel in active_channels():
         try:
-            channel.send(alert)
+            channel.send(text)
         except Exception:
-            log.exception("Alert channel %s failed", channel.name)
+            log.exception("Channel %s failed", channel.name)
 
 
 def notify_crash(exc: BaseException, *, where: str = "bot") -> None:
-    """Best-effort: dispatch a system alert about a crash. Never raises.
+    """Best-effort: dispatch a system message about a crash. Never raises.
 
     Suitable as the last call before the process dies, so the user knows
     Railway (or whatever host) is about to restart / give up.
     """
     tb = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
     # Keep the tail — that's where the actual error lives.
-    detail = tb if len(tb) <= MAX_DETAIL_CHARS else "…\n" + tb[-MAX_DETAIL_CHARS:]
+    detail = tb if len(tb) <= MAX_MESSAGE_CHARS else "…\n" + tb[-MAX_MESSAGE_CHARS:]
     alert = Alert(
         reason="bot_crashed",
         title=f"Serenity crashed in {where}",
@@ -62,4 +65,4 @@ def notify_crash(exc: BaseException, *, where: str = "bot") -> None:
     try:
         dispatch(alert)
     except Exception:
-        log.exception("notify_crash failed to dispatch alert")
+        log.exception("notify_crash failed to dispatch")
