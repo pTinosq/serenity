@@ -49,28 +49,38 @@ def dispatch(message: object, *, force: bool = False) -> None:
     """Send `message` to every active channel.
 
     `message` may be a string, an `Alert`, or anything with `__str__`.
-    Per-channel errors are logged but never raised.
+    Errors are logged but never raised — alerts must not crash callers
+    in the trading loop, no matter what's broken downstream (disk full,
+    bad settings, channel API down).
 
     If MESSAGE_FREQUENCY=daily and `message` is an `Alert`, the alert
     is buffered to the EventLog instead of being delivered now —
     unless `force=True` (used for out-of-band notices like crashes).
     Plain strings always go out immediately.
     """
-    settings = load_settings()
-    if (
-        not force
-        and isinstance(message, Alert)
-        and settings.message_frequency == "daily"
-    ):
-        default_log().append(message)
-        return
+    try:
+        settings = load_settings()
+        if (
+            not force
+            and isinstance(message, Alert)
+            and settings.message_frequency == "daily"
+        ):
+            try:
+                default_log().append(message)
+                return
+            except Exception:
+                # Disk full, read-only fs, etc. Better to deliver now
+                # than to drop the alert silently.
+                log.exception("Event log append failed; delivering immediately")
 
-    text = str(message)
-    for channel in active_channels():
-        try:
-            channel.send(text)
-        except Exception:
-            log.exception("Channel %s failed", channel.name)
+        text = str(message)
+        for channel in active_channels():
+            try:
+                channel.send(text)
+            except Exception:
+                log.exception("Channel %s failed", channel.name)
+    except Exception:
+        log.exception("dispatch failed")
 
 
 def flush_daily_summary() -> None:
