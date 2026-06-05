@@ -34,3 +34,7 @@ eval:
 # Type-check / lint stubs (extend later)
 fmt:
     uv run ruff format src
+
+# Run the labeler web UI (http://localhost:3344) — see labeler/README.md
+labeler:
+    cd labeler && npm install && npm run dev
