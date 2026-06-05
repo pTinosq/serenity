@@ -89,7 +89,7 @@ def run() -> None:
         "Oracle & logging",
         "Defaults work for most users. Hit Enter to keep them.",
     )
-    ask("sentiment_model", "SENTIMENT_MODEL", get("SENTIMENT_MODEL", "openai/gpt-5.4-nano"))
+    ask("sentiment_model", "SENTIMENT_MODEL", get("SENTIMENT_MODEL", "google/gemini-2.5-flash"))
     ask("log_level", "LOG_LEVEL", get("LOG_LEVEL", "INFO"))
 
     section(
