@@ -4,7 +4,12 @@ export type Tweet = { id: string; text: string; created_at: string };
 
 type UserLookupResponse = { data?: { id: string }; errors?: unknown };
 type TimelineResponse = {
-  data?: Array<{ id: string; text: string; created_at: string }>;
+  data?: Array<{
+    id: string;
+    text: string;
+    created_at: string;
+    note_tweet?: { text: string };
+  }>;
   errors?: unknown;
 };
 
@@ -39,8 +44,12 @@ export async function fetchRecentTweets(maxResults = 100): Promise<Tweet[]> {
   const userId = await resolveUserId(handle, bearerToken);
   const capped = Math.max(5, Math.min(100, maxResults));
   const json = await xFetch<TimelineResponse>(
-    `/users/${userId}/tweets?max_results=${capped}&tweet.fields=created_at&exclude=retweets,replies`,
+    `/users/${userId}/tweets?max_results=${capped}&tweet.fields=created_at,note_tweet&exclude=retweets,replies`,
     bearerToken,
   );
-  return json.data ?? [];
+  return (json.data ?? []).map((t) => ({
+    id: t.id,
+    created_at: t.created_at,
+    text: t.note_tweet?.text ?? t.text,
+  }));
 }
