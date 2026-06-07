@@ -17,3 +17,6 @@ wheels/
 
 # Runtime state
 data/
+
+# Eval result cache — keyed by (model, prompt, tweet); cheap to regenerate.
+evals/.cache/
