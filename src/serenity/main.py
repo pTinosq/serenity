@@ -1,7 +1,8 @@
 import argparse
 import logging
 
-from serenity.alerts import Alert, Messenger, notify_crash
+from serenity.alerts import Alert, Messenger, dispatch, notify_crash
+from serenity.alerts.event_log import default_log
 from serenity.alerts.scheduler import start_daily_scheduler
 from serenity.config import Settings, load_settings
 from serenity.executor import TradeExecutor, TradeExecutorError, apply_plan
@@ -105,6 +106,74 @@ def handle_tweet(
             ))
 
 
+def buffer_self_test(settings: Settings) -> None:
+    """In daily mode, prove the event-log buffer actually works at startup.
+
+    Writes a probe Alert, drains the buffer, and checks the probe came
+    back. If anything fails, sends a `force=True` Telegram so the user
+    learns *immediately* that daily-mode buffering is broken on this
+    deploy — rather than discovering it only via mysterious per-trade
+    messages while the buffer silently fails for every event.
+
+    The probe is the only event in the buffer at this point (process
+    just started, buffer either empty or just initialised on disk).
+    Any persistent events from a prior run get drained too; that's
+    fine — those would otherwise sit until the next scheduled flush
+    anyway, and surfacing them here is closer to the user's intent.
+    """
+    if settings.message_frequency != "daily":
+        return
+
+    log_obj = default_log()
+    probe = Alert(reason="buffer_probe", title="serenity startup probe")
+    try:
+        log_obj.append(probe)
+        drained = log_obj.drain()
+    except Exception as exc:
+        log.exception("Buffer self-test failed (append/drain raised)")
+        dispatch(
+            Alert(
+                reason="buffer_broken",
+                title="Daily-mode buffer unusable — falling back to per-tweet",
+                detail=(
+                    f"Append/drain raised {type(exc).__name__}: {exc}. "
+                    f"Path: {log_obj.path.absolute()}. "
+                    "Override EVENT_LOG_PATH to a writable location "
+                    "(e.g. /tmp/serenity/event_log.jsonl on Railway, or "
+                    "a mounted volume path like /data/event_log.jsonl)."
+                ),
+            ),
+            force=True,
+        )
+        return
+
+    if not any(e.alert.reason == "buffer_probe" for e in drained):
+        log.error("Buffer self-test: probe missing after drain")
+        dispatch(
+            Alert(
+                reason="buffer_broken",
+                title="Daily-mode buffer round-trip failed",
+                detail=(
+                    f"Probe alert was written to {log_obj.path.absolute()} "
+                    "but drain() didn't return it. The buffer file may be on "
+                    "a non-persistent filesystem or shared across processes."
+                ),
+            ),
+            force=True,
+        )
+        return
+
+    # Re-buffer any pre-existing events the probe drained out.
+    for evt in drained:
+        if evt.alert.reason != "buffer_probe":
+            try:
+                log_obj.append(evt.alert)
+            except Exception:
+                log.exception("Failed to re-buffer pre-existing event")
+
+    log.info("Buffer self-test OK — daily-mode buffering verified at %s", log_obj.path.absolute())
+
+
 def start_bot() -> None:
     """Stream tweets → Oracle → TradeExecutor → runner.
 
@@ -118,6 +187,8 @@ def start_bot() -> None:
         settings = load_settings()
         oracle = Oracle(settings=settings)
         executor = TradeExecutor(settings=settings)
+
+        buffer_self_test(settings)
 
         if settings.message_frequency == "daily":
             start_daily_scheduler(settings.daily_message_delivery_utc)

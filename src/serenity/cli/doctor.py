@@ -53,6 +53,7 @@ FIELDS = [
     ("telegram_chat_id", "TELEGRAM_CHAT_ID"),
     ("message_frequency", "MESSAGE_FREQUENCY"),
     ("daily_message_delivery_utc", "DAILY_MESSAGE_DELIVERY_UTC"),
+    ("event_log_path", "EVENT_LOG_PATH"),
 ]
 
 
@@ -85,6 +86,24 @@ def source_of(env_var: str) -> str:
     return "default"
 
 
+def buffer_probe(settings: Settings) -> str | None:
+    """Try to write+read the event log path; return None on success or a reason on failure."""
+    if settings.message_frequency != "daily":
+        return None
+    p = Path(settings.event_log_path)
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        probe = p.parent / ".serenity-buffer-probe"
+        probe.write_text("ok", encoding="utf-8")
+        content = probe.read_text(encoding="utf-8")
+        probe.unlink()
+        if content != "ok":
+            return f"wrote 'ok' to {probe} but read back {content!r}"
+    except Exception as e:
+        return f"{type(e).__name__}: {e} (path={p.absolute()})"
+    return None
+
+
 def warnings(settings: Settings) -> list[str]:
     out: list[str] = []
     if settings.alert_fallback_channel == "telegram":
@@ -94,13 +113,20 @@ def warnings(settings: Settings) -> list[str]:
                 "alerts will fall back to stdout at runtime."
             )
     if settings.message_frequency == "daily":
-        out.append(
-            "message_frequency=daily: alerts will be BUFFERED in "
-            "data/event_log.jsonl and delivered at "
-            f"{settings.daily_message_delivery_utc} UTC. Per-tweet messages "
-            "are a bug in this mode — look for `dispatch: frequency=...` "
-            "INFO logs to confirm what the dispatcher saw at each call."
-        )
+        probe_err = buffer_probe(settings)
+        if probe_err is None:
+            out.append(
+                "message_frequency=daily: buffer probe OK at "
+                f"{Path(settings.event_log_path).absolute()}. Alerts will be "
+                f"buffered until {settings.daily_message_delivery_utc} UTC."
+            )
+        else:
+            out.append(
+                "message_frequency=daily BUT buffer probe FAILED: "
+                f"{probe_err}. Daily-mode buffering will be broken — every "
+                "Alert ships per-tweet. Set EVENT_LOG_PATH to a writable "
+                "location (e.g. /tmp/serenity/event_log.jsonl) and redeploy."
+            )
     if not settings.alpaca_api_key or not settings.alpaca_secret_key:
         out.append("Alpaca credentials missing — bot will skip the trading stage.")
     return out

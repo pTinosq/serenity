@@ -34,6 +34,7 @@ FIELDS: list[tuple[str, str]] = [
     ("telegram_chat_id", "TELEGRAM_CHAT_ID"),
     ("message_frequency", "MESSAGE_FREQUENCY"),
     ("daily_message_delivery_utc", "DAILY_MESSAGE_DELIVERY_UTC"),
+    ("event_log_path", "EVENT_LOG_PATH"),
 ]
 
 SECRET_FIELDS = {

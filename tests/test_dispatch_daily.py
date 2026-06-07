@@ -19,6 +19,14 @@ from serenity.alerts import dispatcher
 from serenity.alerts.event_log import EventLog
 
 
+@pytest.fixture(autouse=True)
+def reset_buffer_warning():
+    """The buffer-broken warning is one-shot per process; reset between tests."""
+    dispatcher._buffer_warning_sent = False
+    yield
+    dispatcher._buffer_warning_sent = False
+
+
 class FakeChannel:
     """Records what was sent, so tests can assert delivery vs. buffering."""
 
@@ -116,17 +124,23 @@ def test_daily_mode_buffer_drains_on_flush(fake_channel, tmp_log) -> None:
     assert tmp_log.path.read_text() == ""
 
 
-def test_append_failure_falls_back_to_immediate_delivery(fake_channel, tmp_log, monkeypatch) -> None:
-    """If the buffer write fails, the alert must still reach the user."""
+def test_append_failure_falls_back_with_one_time_warning(fake_channel, tmp_log, monkeypatch) -> None:
+    """If the buffer write fails, the alert reaches the user AND they get a one-time
+    'buffer broken' warning so they understand why per-tweet messages are appearing.
+    """
 
     def broken_append(_alert):
         raise OSError("disk full")
 
-    fake_log = tmp_log  # already wired
-    monkeypatch.setattr(fake_log, "append", broken_append)
+    monkeypatch.setattr(tmp_log, "append", broken_append)
 
     with patch.object(dispatcher, "load_settings", return_value=make_settings("daily")):
         dispatcher.dispatch(Alert(reason="trade_executed", title="BUY 100 XYZ"))
+        # Second dispatch on the same broken buffer: no second warning.
+        dispatcher.dispatch(Alert(reason="trade_executed", title="BUY 200 ABC"))
 
-    # Buffer broke, so we fall through and deliver. User sees the message.
-    assert len(fake_channel.sent) == 1
+    # 2 trade alerts + 1 buffer-broken warning (only fires on first failure)
+    assert len(fake_channel.sent) == 3
+    assert any("buffer is broken" in msg.lower() for msg in fake_channel.sent), (
+        f"Expected a buffer-broken warning among {fake_channel.sent!r}"
+    )
