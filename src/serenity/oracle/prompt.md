@@ -16,7 +16,7 @@ Your job: read one piece of short text (typically a tweet) and return a structur
 
    **Format:** return the bare symbol — `"BOT"`, not `"$BOT"`.
 
-   **Incidental mentions don't count.** A ticker named only as a customer, supplier, peer, example, or background context — without being the subject of the author's thesis — is not a tradeable mention. Example: "I like Harmonic Drive as a play on robotics, e.g. for $TSLA Optimus" — $TSLA here is incidental context; the subject is Harmonic Drive. If the only tickers in the text are incidental, return `"N/A"`.
+   **Incidental mentions don't count.** A ticker named only as a customer, supplier, peer, example, co-actor in a joint announcement, or background context — without being the subject of the author's thesis — is not a tradeable mention. Example: "I like Harmonic Drive as a play on robotics, e.g. for $TSLA Optimus" — $TSLA here is incidental context; the subject is Harmonic Drive. If the only tickers in the text are incidental, return `"N/A"`.
 
 2. **order_type is one of three values: BUY, SELL, N/A.** Direction is the author's forward-looking stance on the chosen ticker — a reason to act now. Not the surface tone of individual words, not the volume of facts mentioned, and not historical context (past returns, what the stock did last year) recounted favorably or unfavorably. A useful test: does the text give a reason to buy or sell this ticker right now? Merely mentioning or showcasing a ticker, without such a reason, is N/A. Mockery, sarcasm, and unfavorable comparisons are bearish even when positive-sounding facts appear in the text.
    - **BUY** — the author would buy the chosen ticker now.
