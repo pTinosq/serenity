@@ -25,7 +25,7 @@
       "ticker": "N/A",
       "order_type": "N/A",
       "confidence": {
-        "eq": 0.0
+        "eq": 0
       }
     }
   },
@@ -85,7 +85,7 @@
       "ticker": "N/A",
       "order_type": "N/A",
       "confidence": {
-        "eq": 0.0
+        "eq": 0
       }
     }
   },
@@ -105,7 +105,7 @@
       "ticker": "N/A",
       "order_type": "N/A",
       "confidence": {
-        "eq": 0.0
+        "eq": 0
       }
     }
   },
@@ -115,7 +115,467 @@
       "ticker": "N/A",
       "order_type": "N/A",
       "confidence": {
-        "eq": 0.0
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Fun times with market corrections.  \n\nLeaders from $NVDA down -4.87% to $MU down -7.03%. High beta names like $PL down -22.02%. \n\nFunny to see media always trying to explain like: \n\n\"Micron suffers record wipeout as Broadcom casts a shadow over chip stocks \"\n\nBroadcom projected https://t.co/D1cE7sjKBs",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Xintec (3374) also looks like an interesting idea (TSMC packaging/test subsidary). \n\nMC is at ~ $2.18B. \n\n$TSM COUPE mass production starts this half, H2 2026. and... they have plans for \"Aggressively pursuing CPO opportunities with subsidiaries Xintec\". \n\nThis is just very https://t.co/e3NXsmQd6v https://t.co/epQLpXoDsF",
+    "result": {
+      "ticker": "TSM",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.5
+      }
+    }
+  },
+  {
+    "tweet": "$SIVE is my favorite CPO / photonics stock after AAOI. \n\nPartly because it's Swedish and you have entertainment from comedians over there. \n\nToday a new non-technical hedge fund called Protean Funds (likely shorting), went on air. \n\nTo said $SIVE CPO applications are imaginary. https://t.co/5RvMnaiDI6",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.8
+      }
+    }
+  },
+  {
+    "tweet": "Apparently my Chinese name is “白毛股神”\n\nWhich translates to “White Hair Stock God” in English.\n\nI’ll gladly accept it. https://t.co/w2a5zAD5f4",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "$RPI: $283 -&gt; $983, up 247% from my thesis post.\n\nQuote: Strong AI-related demand was expected to result in core profit \"significantly ahead\" of market expectations.\n\nTurns out European Media’s favorite “memestock” with “no fundamentals” back in Feb. \n\nWas actually was backed by https://t.co/5dCCgWTDDp",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "$AAOI is one of the names I keep averaging up on since $28.\n\nJust from random shower thoughts… I feel like it’s just imminent to double or triple if they execute? \n\nThere’s just too much demand for 800g/1.6T optical transceivers… \n\nThen this company is targeting the largest https://t.co/E3E6HtlHSp",
+    "result": {
+      "ticker": "AAOI",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.85
+      }
+    }
+  },
+  {
+    "tweet": "Anthropic: “Urges Global Pause in AI Development”\n\nTranslation: “please let us take the lead, stop building!”\n\nRegardless, statements like this encourage every Country to start investing in AI.\n\nImplications are profound from fields of medicine, math, and basically everything. https://t.co/9tfXq99Pc8",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "$RDDT was driving me insane.\n\n&gt; massive earnings beat\n&gt; just printing FCF since they’re too profitable\n&gt; 69% Y/Y revenue growth.\n&gt; biggest moat against AI vibe coding from network effect\n&gt; 91.5% gross margin. \n\nWas just flat for months. Glad to see it getting more attention. https://t.co/umUxYdXkz7 https://t.co/tuVMZIwgAH",
+    "result": {
+      "ticker": "RDDT",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.45
+      }
+    }
+  },
+  {
+    "tweet": "This timeline keeps getting more and more unreal…\n\n$NVDA Jensen Huang to meet Faker (League of Legends)\n\nI did talk with Jensen few years back about PUBG and GPU shortages for mining. \n\nAnd he was enthusiastic about ideas for cross-platform gaming + getting enough allocation to https://t.co/GoYNi0hPDY",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "LOL. I’m honestly laughing there’s new media articles for each one of my X posts.\n\nI appreciate any objective coverage though since it helps combat a lot of the disinformation online. \n\nAm I that popular now? https://t.co/1fOsuqI9px https://t.co/SKbb1Ytcau",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "$SIVE looks like both a chokepoint and a bottleneck for CPO next year. \n\nKeep seeing information published from nontechnical people who miss any nuances.\n \nHere’s the reason why:\n\n1. CW lasers are bottlenecked signaled by $LITE earnings.\n\nLaser fabs are heavily allocated to EML",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "I now am the #1 most subscribed to account on the entire X platform!\n\nAfter overtaking Elon Musk today.\n\nThank you everyone for helping me achieve my goal. https://t.co/XLjy4ZsZyD https://t.co/7oZrE7ypsF",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Yeah… I think all your upstream semi supply chain companies are going much higher.\n\nGoldman now expects a combined $5.3 trillion of capex spending for the four largest hyperscalers $GOOGL / $META / MSFT / $AMZN from 2025 to 2030.\n\nRevised up from $4.5T from Q1 earnings. https://t.co/UtkU1IU2V5",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Well, looks like it’s time to do some research on how to profit off of Cuba’s economic collapse.\n\nFollowing US sanctions last month.\n\nAnyone got ideas? https://t.co/CWkceVbq5R",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "I think my personal style of investing is a bit different, just some reflection:\n\nIt's inherently discretionary, based on stuff markets don't know yet. And a culmination of life experiences?\n\nIf you look at $AXTI, $RPI, $SIVE, $IQE and others. \n\nLot of it is guessing on unstructured relationships then seeing if it's right or not down the line.   \n\n$RPI is the perfect example:\n\n1. Nobody really thought of Raspberry Pis for AI growth. Mainly people bought one or two just for class + education + hobbyist. \n2. After OpenClaw, just noticed all my friends and people just buying Apple Mac Minis / RPIs for AI applications. \n3. Found validation of that trend online with lot of people sharing video tutorials on AI orchestration with RPI. \n4. AI was their ideal perfect growth vector, did some modeling, and thought it was compelling. \n\nEarnings comes out and I was right. \n\nEveryone in media was calling it a meme stock because there's nothing online that shows revenue growth from AI (was 14% forecasted revenue growth, turned out to be 58%, my projection was around 55%).  \n\nSo it was a mix of guessing next industry trend (AI using lightweight hardware instead of GPU clusters), real life trends, then revenue forecasting off my guess.\n\n For stuff like $AXTI: \n\n1. Everyone called it a joke when I bought at ~$12. LLMs would hallucinate and say \"hyperscalers/govs would have known about this by now and fixed this vulnerability with InP substrates\" \n2. Or would conflate very nuanced parts of InP substrate stack, where there's multiple different chokepoints in upstream processing. \n3. So part of this was just discretionary based on what I've seen over InP substrate breakdowns, industry trends, etc. \n4. Then also guessing the major supercycle was photonics (this was before everyone caught onto $LITE, and others). Or before you saw the $141B TAM projections from GS. \n5. AXT owned 40% of InP supply chain, without them the supply chain just gets cripped). \n6. All the \"analysts\" were forecasting steady InP substrate growth, few hundred million TAM, etc. or export controls. \n7. Everyone kept trying to say $AXTI was overvalued based on TAM estimates. But if it's a few hundred million TAM you just think that's a joke and go into game theory over allocations. \n8. Then I just had to guess, how much would this be worth if it were a NAND style bottleneck, what MC could it reach based on control, how much would hyperscalers price it as, etc. \n\nA lot of the current research outputs from Goldman Sachs, or earnings reports from the Epiwafer companies, were confirmed after I published my piece on AXT. If you did research back then, lot of the same material /framing wouldn't have come up. \n\nWith stuff like $XFAB as you're seeing now, a lot of it is just pure guessing:\n\n1. Not really any CPO materials, how much their MTP process makes in revenue, etc. Everyone online keeps saying they're not a photonics player. \n2. But if you go through ASE docs or Gov websites, they all kinda cite XFAB as a major emerging player here. \n3. $NVDA also evaluating them right now (maybe it's successful who knows). \n4. No clear revenue around this area because their main silicon photonics process is still precommercial, but if you guess it's trying to create a EU supply chain to compete with $TSEM, once pre-commercial shifts to commercial, maybe similar but less volume contracts? \n5. Then just seeing updates over the next few months to see if anything confirms this thesis guess. \n\n_ \n\nI think a lot of information discovery still can be done with LLMs I'm seeing online. But it's also really hard to make a bunch of unstructured inferences based on unrelated material or even just trends you're seeing in real life. \n\nSo probably better to just do what's standard, eg. do valuation forecasting based on current numbers\n\nStuff like $AAOI, if they're projecting $471m/M h1 2027 and you see MC at $12B, probably undervalued might be a good idea to go long for next years. \n\nStuff like Samsung Electronics is easier, see what people are modeling for operating profits for 2027, 2028 then just seeing if it's undervalued or not at current levels. \n\nMaybe something harder is $JBL. I haven't really seen any great volume numbers around 1.6T LRO, but you can just make a guess on how popular that might be then project how that might impact current MCs. \n\nOr picking just good names everyone kinda agrees like $TSM, $INTC, $MRVL is also solid. \n\nSo a lot of things is just building up your life skills then applying that to markets. I don't think it's that can be taught with courses and stuff. \n\nOf course, much of what I'm doing is just high conviction inference based on unconnected parts. Could always be wrong.",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Just very helpful timelines reiterated around glass substrate (source: Trendforce):\n\n- SKC Absolics (011790) H2 2026 (first mover x $AMAT) - $AMD customers\n\n- Samsung electromechanics h2 2027 (009150) x Sumitomo Chem (4005) - Apple / $AVGO / hyperscalers \n\nIdk about $INTC 2030 reports, we’ll see.\n\n$TSM CoPoS was 2-3Y was correct though from recent TSM chairman comments. Innolux was interesting beneficiary. $SHMD should be too off TSM but financials were pretty toxic. \n\nSame players should appear multiple times, eg innolux + SKC. \n\nAlso applies to $LPK and upstream equipment seller around these ramps.",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "If you’re curious:\n\n$4649 for 107,894,491 (100M+) impressions!\n\nAll of this is going to dog rescues, will be doing large donations later!\n\nIt’s ~$600 / dog rescued, so it scales proportionally with Serenity fan count!\n\nI also believe in making all my profits off $SIVE to $AAOI with stocks in the market, not off followers.\n\nEspecially if I’m a good enough investor.\n\nSo never felt the need to have high paywalls or do paid ads. (I’d do this anyway even if it weren’t monetized).\n\nI’m glad I can help things I care about just by posting ideas throughout the day for fun. \n\nAnd I’ve seen a lot of followers recently donate to their local shelters in my name.\n\nSo genuinely thank you all for that, makes me happy.",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Apparently I’m all over Chinese news now?\n\nI just published some research on LeaderDrive (688017) and their role in humanoid supply chains.\n\nLooks like China’s robotics stock sector went up and 688017 hit 20% limit up?\n\nI appreciate they called me “Overseas God”. https://t.co/mdASEvmsj0 https://t.co/FM6fLGGKjX",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Okay... just some more weekend shower thoughts about $XFAB.\n\nI still feel like it could be the next $TSEM, just early stage at a $1.4B MC?\n\nThey kinda leapfrogged current gens (which $TSEM are getting volume from) to compete for H2 2027 CPO scale up inflection point ($ASX docs cite Xfab (aka. photonixFAB) as focusing on CPO)\n\nBy building out some black magic MTP (transfer printing) architecture for lasers w/ other stuff like TFLN.\n\nBasically next-gen integration IP, they're still behind on yields, sure.\n\nBut $NVDA evaluating it for transceivers/switches to see if it can volume ramp. That $NOK sets the specifications/assembly for. (nvidia invested in nokia for this these switches/networking too btw). \n\nAnd if their MTP supply chain works... (eg. with Smartphotonics providing lasers, EU players doing assembly).\n\nIt basically volume ramps with $NVDA just like why Nvidia signed long term agreements with $TSEM?\n\nDownside risk?\n\nAlready below replacement book value, can always go lower yeah, but typically to a certain point. \n\nMaybe more CHIPS act subsidies next few months from chips act 2. If it doesn't go well there's SiC (152% Y/Y Growth, 195% Y/Y SiC wafer shipment growth)/GaN power semi upside.\n\nEuropeans /LLMs will say \"oh evaluations doesn't mean it's a future contract!\".\n\nThis is kinda different since the European Union is behind this effort and $XFAB for soverign photonic supply chains.\n\nNot your typical company + hyperscaler evaluation, since $NVDA wants to be nice to Europe's regulators. They'd prob be pissed if nvidia just stayed in US/Taiwan/China.\n\nSo if they can make this MTP black magic work with mass production, feels almost for sure nvidia/nokia volume ramp on some tiny $1.4B silicon photonics foundry or at least throw them a bone with smaller contracts. \n\nIn terms of timelines, maybe just a months early since it volume ramps H2 2027/H1 2028 (which happens to be in line with CPO scale up timelines)...\n\nOr just unknown because they named their project something stupid like photonixfab?\n\nLike XFAB Photonics would have been better? so institutions/screeners can connect the dots when looking at CPO silicon photonic foundry players?\n\nAutomotive should also coming out of a slump medium term, sped up by self-driving (TSM Chairmain comments yesterday said ai automotive was TSM's growth vector alongside robotics). So their core business also should pick up speed too medium term. \n\nObviously markets/europeans want a \"Nvidia signs $2B+ contract, XFab volume ramping 2027!\" \n\nBut by then it will be a $9B+ company and you miss out on all the upside. And especially since everyone analyst/institution is blind to volume expectations for these.... \n\nNormally don't invest in companies in evaluation stages, but this just seems very de-risked by EU sovereignty + Gov backing, and you have Nvidia + Nokia there for volumes if they can make the IP work. \n\nI think markets are probably missing something here...  there's almost 0 value being assigned to being CPO exposure in Europe as their long term upside.",
+    "result": {
+      "ticker": "XFAB",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.8
+      }
+    }
+  },
+  {
+    "tweet": "How are all you regards on $RDDT down -99% after 2 red days? \n\nIs it that hard just to hold indiviudal stocks like $AAOI or $MRVL that are already high-beta?\n\nYou can be right directionally, but wrong on short-term timing. \n\nOne extra week or month makes a huge difference. https://t.co/UrbqiRIIta",
+    "result": {
+      "ticker": "RDDT",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.65
+      }
+    }
+  },
+  {
+    "tweet": "Sigh. \n\nI keep telling retail + Swedish Hedge Funds how important $SIVE is to CPO, but people don’t listen.\n\nEnough retail holders got shaken off, and \nnow JP Morgan managed to buy up a massive stake in Sivers (purely institutional).\n\nJP Morgan went from .4% ownership last month to 5%+ ownership this month…",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.7
+      }
+    }
+  },
+  {
+    "tweet": "Just some random notes about $AVGO earnings transcript \n\n- Revenue target reiterated ($100B+ 2027, pretty sure markets wanted that to be raised this earning, hence the drop)\n\nRemember $NVDA Jensen comments about $MRVL $1T company around networking/connectivity/interconnects? \n\n- “So as the TPUs continue to accelerate, there’ll be pressure overall on margins.\nBut the connectivity side, the AI networking side of the business has very rich margins”\n\n“Demand for …  networking is simply insatiable”\n\nAlso very positive read through as well for the $LITE and the other players. But for TPU margins it goes down at scale, which is understandable. \n\n- “they are placing orders in fairly huge demand, which basically gives us a lot more visibility.. runs all the way to 2028 right now” \n\npositive read through on overall AI demand since it’s 2026 now… and orders are out in 2028\n\n- The initial order for 1 gigawatt, which includes XPUs and our networking has been received and will start Delivery in the second half of 2027. for our other two customers, we expect shipments to begin late 2026 and accelerate into 2027.\n\n$META custom AI program h2 2027 timelines\n\n- “Our revenue, our content per gigawatt will increase. you start putting a lot, you start putting embedding CPU cores into the same XPUs and making those chips basically multi die with lots of hvm.”\n\nJust for the GW modelers.\n\n- “For OpenAI we have delivered silicon and we are on track for production late 2026”\n\nOpenAI custom program timeline\n\n- “If you ask about 27 or 28 that will continue to grow. We expect in fact 28 to be a substantial growth from what we are forecasting in 27.”\n\nMore about the demand ramp, go brrr\n\n- “Google, that we expect a diversity of sources from them” \n\nMediatek (2454) primary beneficary, maybe $MRVL. Already expected though Google doesn’t sole source so they don’t get bottlenecked. \n\nThere’s quite a lot of AI demand visibility way until 2028, which is bullish on the AI sector as a whole. Regardless, Broadcom ends the week +0% lol.\n\nTLDR: Strongly bullish AI demand, especially networking. Stocks don’t move in a straight line up, but demand curves 2026-> 2027 -> 2028.",
+    "result": {
+      "ticker": "AVGO",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.8
+      }
+    }
+  },
+  {
+    "tweet": "EU CHIPS Act 2.0 proposal is now released. \n\nGreat news: Photonics is now confirmed to be the new structural addition to EU policy. \n\nThis is thematically bullish for the EU photonics sector. \n\nThematically:\n\n- \"This new component of the Chips for Europe Initiative supports the development of photonic integrated circuits and associated technologies\"\n\n- \"building and strengthening advanced design, prototyping, and industrial deployment capacities for photonic integrated circuit technologies and other photonic technologies across the Union\"\n\n- \"extend the Union’s design capabilities, including in photonics\"\n\n- \"strengthen existing and develop new pilot lines and open-access semiconductor manufacturing facilities for the prototyping and production of photonic integrated circuits and associated photonic technologies\n\n- \"develop and maintain design libraries and design automation tools for photonic integrated circuits, associated photonic technologies\"\n\n===\n\nMore specifically policy specifically focuses on\n\n-> co-packaged optics for AI data centres (CPO/interconnects focus is bullish read through for $SIVE)\n\n-> “Silicon photonics … applications in high-bandwidth data-centre interconnects…”\n\n-> Capabilities in production technologies including co-packaging and heterogeneous integration with electronic chips, manufacturing equipment, and materials platforms for photonic integrated circuits shall be strengthened ( $XFAB)\n\n-> $SOI directly mentioned in impact analysis regarding structural strengths of the EU. \"The EU has a relatively strong global position in SOI wafers, with Soitec and Siltronic being notable players\"\n\n-> $XFAB also directly mentioned in impact analysis, as part of creating the current funding framework. \n\nObviously structurally positive for $XFAB since they're literally leading the European Silicon Photonics Value chain and listed in First of a Kind (FOAK) category.\n\nInitial interpretation, this is heavily positive for EU photonics leaders that go inside AI DCs as part of EU Policy.  I'm expecting optical players broadly to get a tailwind from this framework. \n\nTLDR: EU photonics structurally go brrr long term. Most positive confirmation is that photonics is structurally a part of European Union policy now. \n\nWe'll likely see the individual photonics names come out after this release, within 3-15 months (typically in the middle somewhere). Markets are forward looking in general.",
+    "result": {
+      "ticker": "XFAB",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.9
+      }
+    }
+  },
+  {
+    "tweet": "Wow, only 1K more subscribers until I  overtake Elon Musk!\n\nRight now I’m at 46K. Elon is at 47K.\n\nThen I’ll hold the crown of the #1 most subscribed to person on the entire X platform?\n\nWhat a fun timeline. https://t.co/sG5xJe9bMY",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Fun to see my highest conviction Neocloud pick in $NBIS age well.\n\nI wrote a thesis last year on the Neocloud sector becoming a major theme.\n\nAnd then picked the King.\n\n-&gt; Nebius is #1 out of the entire sector from $IREN to $CRWV.\n\n$84 -&gt; $260.\n\nThesis validated by markets. https://t.co/RGOt3GSNjW https://t.co/1CKhfpy1BO",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "GUESS WHAT ANON?\n\nAfter today’s new news with Ayar joining Nvidia NVLink fusion.\n\n$SIVE is now the laser source for likely:\n\nThe entire Nvidia’s NVLink CPO listed supply chain ecosystem partners.\n\nFrom Marvell Celestial, Lightmatter, and now Ayar today (the three listed in NVLink CPO).\n\nThis is why I call $SIVE a structural photonics laser chokepoint over CPO and now Nvidia ecosystem supply chains.\n\n-> Celestial was likely a direct customer to Sivers, not through Poet. (2023 investor presentation mapping), then bought by Marvell.\n-> Lightmatter was also listed there as a customer in 2023 investor presentation deck mapping.\n\nAnd… Guess what else?\n\nThen they all happen to use GlobalFoundries.\n\nWhich Sivers is now the GFS silicon photonics foundry-level reference laser (also new news yesterday).\n\nSupply chain mapping all starting to make sense now anon?\n\nSivers is also likely now the primary laser source for Ayar after they removed Macom/Lumentum their laser supply chain section (now just gfs/sivers), as a cherry on top.\n\nAlgorithms completely miss this type of image based mapping.\n\nAfter this announcement, I personally think current valuations are very undervalued:\n\nGiven Sivers now holds one of the most important structural laser chokepoint over Nvidia CPO NVLink ecosystem supply chains.",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.6
+      }
+    }
+  },
+  {
+    "tweet": "Wow… new extremely transformative news got released today.\n\nMaking a certain photonics company:\n\nThe effective upstream laser chokepoint for $NVDA NVLink fusion CPO ecosystem.\n\nWith their lasers now in Nvidia’s optical infrastructure supply chains.\n\nCan anyone guess the name?",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Europe is releasing its Tech Sovereignty Package, today June 3rd. \n\nThis includes, CHIPS ACT 2.0, which is expected to prioritize photonics. \n\nBoth $XFAB and $SIVE are highlighted in the Industry Policy Blueprints, which guides EU legislation.\n\nThis proposes sovereign backing with €30–500 million financing facilities per company and revenue demand incentivizes. \n\nTo bridge early European companies to volume production. \n\nI personally expect my two thesis ideas to be large beneficiaries:\n\n- $XFAB, given they're leading Europe's SiPH value chain, with Nokia and Nvidia evaluating them for photonics HVM. \n\n- and $SIVE as Europe's leader for lasers in AI datacenters, scaling lasers to mass production in 2027. \n\nMore details will be announced today, but this is a structural tailwind to photonics critical to Western and especially EU supply chains.",
+    "result": {
+      "ticker": "XFAB",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.8
+      }
+    }
+  },
+  {
+    "tweet": "Is majority of the next generation stuck in the permanent underclass?\n\n&gt; Missed out on gaining control of AI through ownership of infra/compute today\n\n&gt; Majority of jobs getting replaced by AI\n\n&gt; Housing more expensive \n\n&gt; Inflation makes cost of living go brrr. \n\nGg?",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Okay yeah should have trusted Jensen more on $MRVL after what he did with $NBIS.\n\nHe actually gave a $1T price target this time with Marvell. \n\nMarvell up 35% with one remark… https://t.co/Evv6QF8oMO https://t.co/gOXjfJIVE5",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "$LITE rode the first optical wave from $3B to $75B in 2 years time with EML and pluggables.\n\nMy thesis is $SIVE can do the same from $3B, with CPO/Pluggables and CW. \n\nSivers + GFS SiPH reference laser news, alongside the +54% increase today.\n\nIs just one step of the way. https://t.co/Hfth69ZnYm",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.7
+      }
+    }
+  },
+  {
+    "tweet": "Tbh $XFAB lowkey reminds me of early $TSEM.\n\nJust sub <$2B MC.\n\nYou basically never find a company with $NVDA and $NOK actively validating your pre-commercial silicon photonics foundry… (photonixFAB)\n\nWhile getting CHIPS act/Gov grants to subsidize capex.\n\nWhile leading the Europe’s effort to build a photonics supply chain. \n\nFeels like that alone would justify valuations… but you get the power semi SiC/GaN operations for free too and all its assets. \n\nCHIPS act 2 is coming out tomorrow, and $XFAB is listed in the photonics blueprints.\n\nDid I miss something? \n\nOr did markets miss something?",
+    "result": {
+      "ticker": "XFAB",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.7
+      }
+    }
+  },
+  {
+    "tweet": "DID YOU LISTEN ANON?\n\nReuters: New Sivers x GFS strategic collaboration.\n\n$SIVE has now announced its lasers will be integrated into reference designs built on Globalfoundries Silicon Photonics Platform.\n\nFor pluggable optical transcivers, CPO, and SiPH.\n\nThis is fundamentally the most groundbreaking news for Sivers in history.\n\nAs Broadcom, Nvidia, Marvell, AMD, and anyone who goes through GFS silicon photonics has Sivers embedded as a default laser route.\n\nI personally think this news alone should easily 2x or 3x Sivers market cap over the medium term, given how fundamental this is to their revenue.\n\nTo have Sivers be the standard laser route for the many hyperscalers that use the world's leading photonics foundry.",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 1
+      }
+    }
+  },
+  {
+    "tweet": "The most consequential event of an entire company’s history.\n\nGot released today with a photonics player.\n\nMaking them the functional standard laser for CPO, Pluggables, and SiPH.\n\nFor companies like $NVDA, $AVGO, $AMD, to $MRVL using the foundry.\n\nDoes anyone know the name?",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "$NVDA Jensen Huang:\n\n“ $MRVL the next $1T company ladies and gentlemen “.\n\nMarvell is currently trading at $191B.\n\nI have positions in Marvell… but how much faith do we have in Jensen for the 5x? https://t.co/II4DTZ5Z9D",
+    "result": {
+      "ticker": "MRVL",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.55
+      }
+    }
+  },
+  {
+    "tweet": "I never thought I’d see the day where $GOOGL needs to raise $80b for AI capex…\n\nThen Warren Buffet’s $BRK.A is funding the hyperscaler AI buildout. \n\n- $40B ATM, $30B offerings, Berkshire $10B\n\nUpstream ecosystem from $LITE to $AVGO to Mediatek to $TSM to $MU should go brrr.\n\nNot sure if the Google holders are though, given this massive capex scale isn’t as funded by FCF.",
+    "result": {
+      "ticker": "LITE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.7
+      }
+    }
+  },
+  {
+    "tweet": "I did say $AAOI was my favorite US optical long...\n\n+20.1% today. \n\nIf you want the next $SNDK, you're looking at it. \n\nI think H1 entering H2 2027 will likely be that massive inflection point for photonics players. \n\nWe're just a tad early entering H2 2026 while everyone is building up capacity. \n\nJust a general rule of thumb in general if your name isnt space or quantum, markets are forward looking round 8 months. \n\nThat revenue ramp inflection point is coming, more of a matter of when, waiting for it, and embracing volatility in the meantime.",
+    "result": {
+      "ticker": "AAOI",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.8
+      }
+    }
+  },
+  {
+    "tweet": "$ARM is just ridiculous.\n\n$134 straight to $413 in just 2 1/2 months. \n\nShould have went options, would have been up thousands of percent instead of only 3x. https://t.co/tF335Qp656 https://t.co/WdAbRfJuBv",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "Holy sht, plot armor confirmed with $NBIS https://t.co/1QwwKSRxSt https://t.co/yQ4nd332bv",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "And a few months later... my $EWY leaps are now up 485%. \n\nFrom IV expansion and directional memory longs. \n\nUnfortunately I did see a lot of people sell during the Iran volatility, due to doomposting everywhere on X.\n\nBut returns going long on the memory sector from Samsing SK Hynix / $MU have been absolutely disgusting to watch. \n\nIf you can model Samsung / SK Hynix becoming the most profitable companies in the world in 2028... \n\nMaybe it's a good idea to just embrace the volatility and let that thesis play out.",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "A special thank you to the only European stock green today: $IQE. \n\nUp to $54, from when I went long at $12-13, 4 months ago. \n\nUnfortunately lot of volatility with the other ones from $LPK, $SOI, $XFAB, and $ALRIB. https://t.co/FysZyHk5OK https://t.co/rRCORshRmj",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "There's a new $SIVE short seller with 0 clue what they're talking about. \n\n1. $MRVL Celestial is likely buying lasers directly with $SIVE as the laser supplier, not through $POET. \n\nAs they've been identified as a likely direct customer since 2023. \n\nAn analogy is if O-Net / Enablence / Sivers, and O-Net worked directly with $SIVE (which they have) but vertically integrated away Enablence.\n\nThey're still likely buying $SIVE lasers. \n\n2. $SIVE is clearly the likely $AAPL supplier for lasers. I use the term likely, because although markets are 99% sure, the BOM is confidential. \n\nThe short seller is claiming it's TASC, which I've already identified multiple times as an Apple supplier. \n\nBut falsely they're conflating two different generations of Apple Watches with photodiodes and lasers for glucose monitoring to say $SIVE is not a supplier. \n\n3. US NASDAQ listing is likely incoming soon after the new board meeting and shareholder vote. \n\nUpgrading accounting standards and having immaterial changes doesn't mean anything. \n\n4. Ayar labs hasn't scaled up yet. Ayar specifically listed $SIVE as their primary laser supplier in their website. \n\nWith their executives going out on statement that they couldn't built their products without $SIVE lasers. \n\nClaiming $SIVE isn't shipping volume to Ayar when their CPO products haven't ramped is stupid. \n\n5. There's zero leak around news for listing. Hilarious coincidence and management has always been pursuing NASDAQ listing since last year. \n\nShort sellers keep repeating this disinformation to try and profit.\n\n6. I've never seen such hilarious BS around Win Semi volume scaling. High confidence in SpaceX and $AVGO supply chain critical foundry.  \n\n7. Using arguments from authority saying they know an engineer and then having them confusing architectural differences between $LITE / $COHR and $SIVE is hilarious. \n\nRegardless\n\n-distorting financial statements \n-conflating different gen architectures and timeline NRE\n- reiterating false accusations\n\nto profit off short term sentiment is likely going to see them turn into a long as CPO/Jabil partnerships volume ramp.",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.7
+      }
+    }
+  },
+  {
+    "tweet": "$NVDA, Siemens, and $FLNC develop reference power architectures for Vera Rubin N72.\n\nThis comes at the time FLNC has 2 likely hyperscaler deals coming up. \n\nJust in case why you’re wondering it’s up 36%. https://t.co/8f4gAhJeTE",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
+      }
+    }
+  },
+  {
+    "tweet": "This is the biggest TAM expansion + revenue driver with $SIVE, markets haven’t noticed.\n\nSivers is actively working with new pluggable optical transceiver companies.\n\nAfter Jabil 1.6T LRO used Sivers lasers to achieve a “relatively dramatic moat”. \n\n“Actively working”, so co-development / qualification stage. \n\nMy guess is we’ll likely see optical transceiver companies (eg. Innolight), announce they’re using $SIVE lasers soon.",
+    "result": {
+      "ticker": "SIVE",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.7
+      }
+    }
+  },
+  {
+    "tweet": "Just some mobile shower thoughts around $XFAB and train of thought:\n\n1. 800vdc $NVDA push look for GaN/SiC players / power semis.\n\n2. $NVTS and other fabless/fab-lite beneficiaries of $NVDA push probably use foundry models \n\n3. care more about Western supply chains over Asia, want to build up Western capabilities + Western premiums. \n\n4 China has a lot of capacity, maybe risk into 2028, but again it’s building up Western supply chains \n\n5. XFAB only high volume SiC foundry in America (others like $ON or Infineon are vertically integrated)\n\n6. advanced 6in SiC, 8in GaN on Si, building out 8in GaN\n\n7. Maybe likely they’re developing 8in SiC from CHIPS backing, just not public material\n\n8. check SiC revenue -> 152% Y/Y growth okay. Probably something markets missed, since blended looks worse from automotive slump, that should come out recovery\n\n9. $NVTS and others turns out to use $XFAB. $POWI cites $XFAB in filings, among others.\n\n10. both are $NVDA power semi explicit partners, great exposure indicator to 800vdc power semi players. \n\n11. US Dpt. of commerce cites $XFAB as only high volume SiC foundry in the US, $50M PMT\n\n12. validation from US Gov about critical component in supply chains is amazing \n\n13. EU CHIPS Act gives $XFAB $128M EU, for foundry (MEMS, AI, etc), okay turns out they’re critical MEMS player\n\n14. So that’s validation from EU gov about critical component in supply chains, dual continent subsidies\n\n15. So now we know $XFAB is a critical MEMS foundry so you get SiC capabilities, GaN development, and MEMS upside\n\n16. they also got $47.6M EU funding for leading Silicon Photonics supply chain in EU. So that’s EU funding on multiple angles. \n\n17. Turns out, I know all the players there from smartphotonics from $GFS deck.\n\n18. $NVDA and $NOK are qualifying them for silicon photonics HVM. I think this is just a government backing angle for success in EU photonics so likely to succeed… kinda like how Us gov encourages everyone to use $INTC. \n\n19. Okay chips act 2 is coming out next week… so they’ll probably get funding there or more revenue commitments \n\n20. 1.28 p/b, now that’s probably just book cost? Likely coming out of $SOI type legacy drag cycle.\n\n21. Did some modeling around actually replacement values, true replacement p/b cost likely ~.5/.7.\n\n22. Getting business for free, while having upside from SiC near term into Silicon Photonics / GaN as main growth past H2 2027.\n\nThoughts: derisked by p/b values + replacement value. maybe like 20% downside from macro.\n\nHowever, critical dual continent importance. So downside risk seems low, but upside is compelling. \n\nLot of capex likely backstopped by upcoming chips act catalyst + national security concerns. \n\nMaybe 2.5-4x rerating seems possible/likely. \n\nNot a 10-20x, but recovery from depressed valuations from silicon photonics upside with SiC / GaN bridge.  \n\nTLDR: likely trading lower than replacement value, dual continent subsidies likely subsidize capex.\n\nGov grants shows importance to Western supply chains, photonics longer term upside, SiC/GaN demand likely near term upside and bridge. \n\nDon’t control any recent volatility, should shake out anyone not really confident in the thesis though. \n\nCHIPS act 2 from EU is coming up, $XFAB was listed in earlier blueprints for optical ecosystem, so should get a boost after that comes out as near term event catalysts.\n\nSo now is the risk reward seems compelling, we’ll see if this is right or not",
+    "result": {
+      "ticker": "XFAB",
+      "order_type": "BUY",
+      "confidence": {
+        "gte": 0.85
+      }
+    }
+  },
+  {
+    "tweet": "I had higher expectations for Shunsin tbh.\n\nIt’s been close to a month and a half and it’s only up 39.96%.\n\nMaybe I’m not as good with Taiwanese optical stocks. https://t.co/MbqvMTPiE6 https://t.co/2zClJN4bl2",
+    "result": {
+      "ticker": "N/A",
+      "order_type": "N/A",
+      "confidence": {
+        "eq": 0
       }
     }
   }
