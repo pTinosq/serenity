@@ -1,0 +1,25 @@
+{
+  "cash": 500.0,
+  "positions": [
+    {
+      "ticker": "XFAB",
+      "side": "long",
+      "qty": 50,
+      "avg_entry_price": 20.0,
+      "current_price": 22.0,
+      "market_value": 1100.0,
+      "unrealized_pl": 100.0,
+      "unrealized_plpc": 0.10
+    },
+    {
+      "ticker": "AAPL",
+      "side": "long",
+      "qty": 2,
+      "avg_entry_price": 240.0,
+      "current_price": 260.0,
+      "market_value": 520.0,
+      "unrealized_pl": 40.0,
+      "unrealized_plpc": 0.083
+    }
+  ]
+}
