@@ -22,10 +22,10 @@ ENV PATH="/app/.venv/bin:$PATH" \
 
 WORKDIR /app
 
-RUN useradd --create-home --uid 1000 serenity
-
-COPY --from=builder --chown=serenity:serenity /app /app
-
-USER serenity
+# Run as root so mounted volumes (e.g. Railway's /data) are writable
+# without an entrypoint chown dance. The container is single-purpose
+# and sandboxed by the host; the security delta from a non-root user
+# is not worth the volume-permission friction here.
+COPY --from=builder /app /app
 
 CMD ["serenity", "--headless"]
