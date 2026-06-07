@@ -58,13 +58,21 @@ def dispatch(message: object, *, force: bool = False) -> None:
     """
     try:
         settings = load_settings()
-        if (
-            not force
-            and isinstance(message, Alert)
-            and settings.message_frequency == "daily"
-        ):
+        is_alert = isinstance(message, Alert)
+        # INFO-level so it shows up in Railway logs without bumping verbosity.
+        # Lets users correlate a per-trade message arriving with which branch
+        # the dispatcher actually took — the only reliable way to diagnose
+        # "I'm in daily mode but getting per-tweet messages" from production.
+        log.info(
+            "dispatch: frequency=%s alert=%s force=%s -> %s",
+            settings.message_frequency,
+            is_alert,
+            force,
+            "BUFFER" if (not force and is_alert and settings.message_frequency == "daily") else "SEND",
+        )
+        if not force and is_alert and settings.message_frequency == "daily":
             try:
-                default_log().append(message)
+                default_log().append(message)  # type: ignore[arg-type]
                 return
             except Exception:
                 # Disk full, read-only fs, etc. Better to deliver now
