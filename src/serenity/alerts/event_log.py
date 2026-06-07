@@ -12,8 +12,6 @@ Thread-safe: append() and drain() can race (bot loop appends from the
 tweet handler; scheduler drains from a daemon thread).
 """
 
-from __future__ import annotations
-
 import json
 import logging
 import threading

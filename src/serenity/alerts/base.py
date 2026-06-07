@@ -7,8 +7,6 @@ deliver. Callers who just want to say something can pass a bare
 string instead.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol

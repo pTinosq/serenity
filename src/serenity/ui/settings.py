@@ -24,6 +24,8 @@ FIELDS: list[tuple[str, str]] = [
     ("min_confidence", "MIN_CONFIDENCE"),
     ("min_trade_usd", "MIN_TRADE_USD"),
     ("max_trade_usd", "MAX_TRADE_USD"),
+    ("max_position_usd", "MAX_POSITION_USD"),
+    ("max_trades_per_day", "MAX_TRADES_PER_DAY"),
     ("alpaca_api_key", "ALPACA_API_KEY"),
     ("alpaca_secret_key", "ALPACA_SECRET_KEY"),
     ("alpaca_paper", "ALPACA_PAPER"),

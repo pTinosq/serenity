@@ -6,12 +6,30 @@ and executes the trade against Alpaca.
 
 ## Architecture
 
-Three stages chained through narrow interfaces so each can be developed
-and tested in isolation:
+Four stages, two of them LLM agents, chained through narrow interfaces:
 
 ```
-[Twitter] --tweet: str--> [LLM] --TradeSignal--> [Trading]
+[Twitter] --tweet--> [Oracle] --TradeSignal--> [TradeExecutor] --TradePlan--> [Runner]
+                       agent                       agent                   submits orders
 ```
+
+Both agents inherit from the shared harness in `src/serenity/agents/`.
+Adding a new agent is one OOP instantiation: a class with `name`,
+`output_model`, and `prompt_path`, plus whatever domain-specific
+method composes the user message.
+
+### 0. Agent harness (`src/serenity/agents/`)
+
+`Agent[OutputT]` (generic in the Pydantic output type) owns the
+OpenRouter wiring: a process-wide cached `OpenRouter` client, the
+system prompt loaded from `prompt_path`, the response schema derived
+from `output_model` and recursively locked with
+`additionalProperties: false` (strict JSON-schema mode needs this on
+every nested object, not just the root), and the parse step that
+turns the model's content back into a Pydantic instance. Subclasses
+typically wrap `self.run(user_message)` with a domain-named method
+(`Oracle.analyze`, `TradeExecutor.decide`) so callers don't see the
+raw string transport.
 
 ### 1. Twitter interface (`src/serenity/twitter.py`)
 
@@ -27,68 +45,87 @@ remains swappable with `input(":")` for offline dev.
 
 ### 2. Oracle (`src/serenity/oracle/`)
 
-The middle stage. Implemented. `Oracle.analyze(text)` reads a piece of
-text and returns a `TradeSignal`:
+A thin `Agent[TradeSignal]` subclass. `Oracle.analyze(text)` reads a
+piece of text and returns a `TradeSignal`:
 
 - `ticker: str` — ticker explicitly mentioned or very confidently
-  inferred from a well-known company name. The string `"N/A"` is the
-  abstention sentinel (no identifiable ticker).
+  inferred from a well-known company name. `"N/A"` is the abstention
+  sentinel (no identifiable ticker).
 - `order_type: Literal["BUY", "SELL", "N/A"]` — direction implied by
-  sentiment, or `"N/A"` when the text doesn't give enough to act on
-  (no ticker, observational text, hedged sentiment, or multiple
-  tickers without a dominant subject). When `order_type == "N/A"`,
-  `ticker` must also be `"N/A"`.
+  sentiment, or `"N/A"` when the text doesn't give enough to act on.
+  When `order_type == "N/A"`, `ticker` must also be `"N/A"`.
 - `confidence: float` (0.0 – 1.0) — clarity of the signal in the
-  text. Must be exactly `0.0` when `order_type == "N/A"`.
+  text. `0.0` exactly when `order_type == "N/A"`.
+- `sentiment: float` (0.0 – 1.0) — conviction magnitude. Distinct from
+  confidence; `0.0` exactly when `order_type == "N/A"`.
 
-The system prompt lives at `oracle/prompt.md` and is loaded via
-`Path(__file__).parent / "prompt.md"`. The OpenRouter client is a
-process-wide singleton via `functools.lru_cache(maxsize=1)`. Model id
-is configurable via `SENTIMENT_MODEL` and uses OpenRouter's
-`provider/model` format (e.g. `google/gemini-2.5-flash`). Structured
-output is enforced via `response_format={"type": "json_schema", ...}`
-with `strict: true` and the schema is derived from `TradeSignal`.
+The Oracle's job ends here. It does **not** decide how much to trade
+or whether to trade at all — that's the executor's job, with full
+portfolio context the Oracle never sees.
 
-An interactive REPL at `src/serenity/cli/analyze.py` (`just oracle`)
-lets you type free-text and see the TradeSignal output.
+System prompt at `oracle/prompt.md`. Model id is `SENTIMENT_MODEL`
+(default `google/gemini-2.5-flash`); shared with the executor.
 
-### 3. Trading interface (`src/serenity/trading.py`)
+Interactive REPL at `src/serenity/cli/analyze.py` (`just oracle`)
+shows both the Oracle signal and (if Alpaca creds are set) the
+executor's plan, gated on a confirm before submitting.
 
-`execute_trade(signal, settings)` turns a `TradeSignal` into a market
-order via `alpaca-py`. Submits a `MarketOrderRequest` sized by
-sentiment magnitude:
+### 3. TradeExecutor (`src/serenity/executor/`)
 
-```
-notional = clamp(signal.sentiment * MAX_TRADE_USD, MIN_TRADE_USD, MAX_TRADE_USD)
-notional = min(notional, available_cash)
-```
+The second agent, also an `Agent` subclass — output type `TradePlan`.
+Per tweet, `TradeExecutor.decide(tweet, signal, positions, available_cash)`
+sees:
 
-So weaker calls cost less and the bot doesn't blow its budget on the
-first hot signal. `confidence` remains the *gate* (sub-`MIN_CONFIDENCE`
-trades are skipped); `sentiment` is the *sizer*. Returns a
-`TradeOutcome` enum:
+- the original tweet text (for nuance the Oracle compressed away)
+- the Oracle's structured signal
+- the current portfolio (each position with cost basis, market value,
+  unrealized P&L, and portfolio_fraction)
+- available cash for new trades
+- the configured risk bounds (`MIN_TRADE_USD`, `MAX_TRADE_USD`,
+  `MAX_POSITION_USD`)
 
-- `EXECUTED` — order submitted.
-- `SKIPPED_NO_SIGNAL` — `order_type == "N/A"`.
-- `SKIPPED_LOW_CONFIDENCE` — `confidence < MIN_CONFIDENCE`.
-- `SKIPPED_BELOW_MIN_TRADE` — sized below `MIN_TRADE_USD`.
-- `SKIPPED_PRICE_TOO_HIGH` — opening a short but one share costs more than the sized notional (see below).
-- `SKIPPED_NOT_TRADEABLE` — Alpaca returned 40010001 ("asset not active" / "not found"). Most often the Oracle extracted a foreign-listed ticker that happened to be cashtagged like a US one (e.g. `$SIVE` is Sivers Semiconductors on Nasdaq Stockholm).
-- `SKIPPED_NO_CASH` — Alpaca cash balance below `MIN_TRADE_USD`.
-- `SKIPPED_NO_CREDENTIALS` — Alpaca keys not set; rest of pipeline runs.
-- `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
+and returns a `TradePlan` — a list of `TradeAction`s (`BUY` notional,
+`TRIM` fraction, `CLOSE`, or `HOLD`) plus a one-sentence summary. The
+plan can be empty; that's a valid answer.
 
-Alpaca disallows fractional shorts: submitting a SELL with `notional`
-on a ticker we don't hold returns `42210000`. We catch that, fetch
-the last trade price via `StockHistoricalDataClient`, recompute as
-`qty = floor(notional / price)`, and retry. If `qty < 1` (stock
-costs more than the sized notional), the trade is skipped with
-`SKIPPED_PRICE_TOO_HIGH`. Closing-long SELLs on tickers we hold are
-not affected and continue to use fractional notional.
+The prompt at `executor/prompt.md` encodes the policy: BUY when no
+existing position; top-up at half-size on high-conviction reinforce;
+CLOSE long positions on high-conviction SELL; do nothing if cash is
+too low (don't try to clever-rebalance by closing other names).
+
+### 4. Runner (`src/serenity/executor/runner.py`)
+
+`apply_plan(client, settings, plan, available_cash)` is the bridge
+from `TradePlan` to actual Alpaca orders, with hard safety guards
+that don't trust the LLM:
+
+- `MAX_TRADES_PER_DAY` cap (counts every order Alpaca has seen on
+  this account since UTC midnight). If hit, the whole plan is
+  skipped with `Outcome.SKIPPED_DAILY_CAP`.
+- For BUY: existing position value is fetched; the action is sized
+  down to fit the `MAX_POSITION_USD` headroom, capped at remaining
+  cash, capped at `MAX_TRADE_USD`. If headroom < `MIN_TRADE_USD`, skip
+  with `SKIPPED_POSITION_CAP`.
+- For TRIM/CLOSE: requires an existing position; otherwise
+  `SKIPPED_NO_POSITION`. Submits via `close_position(..., percentage)`
+  for TRIM and `close_position(...)` for CLOSE (the endpoint is
+  symmetric across long/short).
+- Individual action failures don't stop later actions — partial
+  application beats silent drops.
+
+`src/serenity/trading.py` is now a small infrastructure module:
+cached `TradingClient` builder + the `size_trade` sentiment-to-notional
+helper (kept as the canonical default-sizing formula, used by tests
+and exposed for callers that want it).
+
+### Portfolio snapshot (`src/serenity/portfolio/`)
+
+Single-file module: one model (`PortfolioPosition`), one function
+(`fetch_portfolio(client)`). Reads open positions from Alpaca and
+pre-computes each row's `portfolio_fraction` so the executor agent
+can reason about concentration without a second pass over the data.
 
 `ALPACA_PAPER` defaults to `True`, so the default install is safe.
-The `TradingClient` is a process-wide singleton via
-`functools.lru_cache(maxsize=1)`, same pattern as the Oracle client.
 
 ## Settings
 
@@ -197,6 +234,11 @@ right action but the wrong ticker is still useless.
   Both auto-load `.env` (`set dotenv-load := true`).
 - Single console-script entry point: `serenity = "serenity.main:main"`.
 - src-layout package under `src/serenity/`.
+- **Never** write `from __future__ import annotations`. This project
+  targets Python 3.12+ (`pyproject.toml` pins `>=3.12`); the future
+  import does nothing on modern Python and is just noise. Modern
+  union syntax (`X | None`), built-in generics (`list[str]`), and
+  string-quoted forward references all work natively.
 
 ## Workflow
 

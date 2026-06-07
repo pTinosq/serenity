@@ -1,7 +1,5 @@
 """Stdout alert channel — a rich-formatted panel for terminal sessions."""
 
-from __future__ import annotations
-
 from collections import defaultdict
 
 from rich import print as rprint

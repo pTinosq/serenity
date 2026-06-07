@@ -13,8 +13,6 @@ Lives under `serenity.cli` because it's a developer / setup tool, not
 a runtime feature. Invoked via `just init`.
 """
 
-from __future__ import annotations
-
 from dotenv import dotenv_values, set_key
 
 from serenity.ui import gum

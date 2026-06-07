@@ -20,3 +20,6 @@ data/
 
 # Eval result cache — keyed by (model, prompt, tweet); cheap to regenerate.
 evals/.cache/
+
+# Per-developer dry-run state for `just dry-run` — local sandbox.
+dry_run_state.json
