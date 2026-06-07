@@ -43,6 +43,12 @@ labeler:
 test:
     uv run pytest
 
+# Print the effective settings the bot sees, plus where each value
+# comes from (env / .env / default). Useful for diagnosing
+# "production behaves differently from local".
+doctor:
+    uv run python -m serenity.cli.doctor
+
 # Pipeline dry-run: send a fake tweet through Oracle + TradeExecutor
 # against a fake portfolio (see dry_run_state.example.json). No orders
 # are submitted. Costs one Oracle call + one Executor call.

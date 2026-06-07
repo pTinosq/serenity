@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     daily_message_delivery_utc: Annotated[
         str, StringConstraints(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
     ] = "21:30"
+    # Where the daily-mode JSONL buffer lives. On Railway the working
+    # directory may not be writable; in that case override to e.g.
+    # `/tmp/serenity/event_log.jsonl` (ephemeral) or a mounted volume
+    # path like `/data/event_log.jsonl` (persistent across restarts).
+    event_log_path: str = "data/event_log.jsonl"
 
 
 def load_settings() -> Settings:

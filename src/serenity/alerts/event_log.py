@@ -45,6 +45,12 @@ class EventLog:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             with self.path.open("a", encoding="utf-8") as f:
                 f.write(line + "\n")
+        log.info(
+            "EventLog appended: reason=%s path=%s size=%d",
+            alert.reason,
+            self.path,
+            self.path.stat().st_size if self.path.exists() else -1,
+        )
 
     def drain(self) -> list[Event]:
         """Return all buffered events and clear the log atomically."""
@@ -103,8 +109,16 @@ _default_log: EventLog | None = None
 
 
 def default_log() -> EventLog:
-    """Process-wide singleton, lazily constructed."""
+    """Process-wide singleton, lazily constructed.
+
+    Uses the path from settings (`EVENT_LOG_PATH`) so it can be moved
+    off of the default `data/` directory in environments where `data/`
+    isn't writable (read-only Railway filesystem layout, for example).
+    """
     global _default_log
     if _default_log is None:
-        _default_log = EventLog()
+        from serenity.config import load_settings
+        path = Path(load_settings().event_log_path)
+        _default_log = EventLog(path=path)
+        log.info("EventLog initialised at %s", path.absolute())
     return _default_log

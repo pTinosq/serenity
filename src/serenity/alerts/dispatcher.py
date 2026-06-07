@@ -29,6 +29,12 @@ log = logging.getLogger(__name__)
 # Telegram caps messages at 4096 chars; leave headroom.
 MAX_MESSAGE_CHARS = 3500
 
+# Whether we've already warned the user about a broken daily buffer.
+# Without this guard, every dispatch with a broken buffer would send
+# both the original alert AND a "buffer broken" notice — flooding
+# Telegram. One warning per process lifetime is enough.
+_buffer_warning_sent = False
+
 
 def active_channels() -> list[AlertChannel]:
     settings = load_settings()
@@ -56,20 +62,52 @@ def dispatch(message: object, *, force: bool = False) -> None:
     unless `force=True` (used for out-of-band notices like crashes).
     Plain strings always go out immediately.
     """
+    global _buffer_warning_sent
     try:
         settings = load_settings()
-        if (
-            not force
-            and isinstance(message, Alert)
-            and settings.message_frequency == "daily"
-        ):
+        is_alert = isinstance(message, Alert)
+        # INFO-level so it shows up in Railway logs without bumping verbosity.
+        # Lets users correlate a per-trade message arriving with which branch
+        # the dispatcher actually took — the only reliable way to diagnose
+        # "I'm in daily mode but getting per-tweet messages" from production.
+        log.info(
+            "dispatch: frequency=%s alert=%s force=%s -> %s",
+            settings.message_frequency,
+            is_alert,
+            force,
+            "BUFFER" if (not force and is_alert and settings.message_frequency == "daily") else "SEND",
+        )
+        if not force and is_alert and settings.message_frequency == "daily":
             try:
-                default_log().append(message)
+                default_log().append(message)  # type: ignore[arg-type]
                 return
-            except Exception:
+            except Exception as exc:
                 # Disk full, read-only fs, etc. Better to deliver now
-                # than to drop the alert silently.
+                # than to drop the alert silently — but ALSO warn the
+                # user once that daily-mode buffering is broken, so
+                # they understand why they're suddenly seeing per-trade
+                # messages despite frequency=daily.
                 log.exception("Event log append failed; delivering immediately")
+                if not _buffer_warning_sent:
+                    _buffer_warning_sent = True
+                    try:
+                        text = str(Alert(
+                            reason="buffer_broken",
+                            title="Daily-mode buffer is broken — delivering immediately",
+                            detail=(
+                                f"Tried to append to the event log and got "
+                                f"{type(exc).__name__}: {exc}. "
+                                "Set EVENT_LOG_PATH to a writable location. "
+                                "Until fixed, every Alert ships per-tweet."
+                            ),
+                        ))
+                        for channel in active_channels():
+                            try:
+                                channel.send(text)
+                            except Exception:
+                                log.exception("Buffer-warning channel %s failed", channel.name)
+                    except Exception:
+                        log.exception("Failed to surface buffer-broken warning")
 
         text = str(message)
         for channel in active_channels():
