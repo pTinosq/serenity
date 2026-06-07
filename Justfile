@@ -38,3 +38,7 @@ fmt:
 # Run the labeler web UI (http://localhost:3344) — see labeler/README.md
 labeler:
     cd labeler && npm install && npm run dev
+
+# Run the pytest suite
+test:
+    uv run pytest
