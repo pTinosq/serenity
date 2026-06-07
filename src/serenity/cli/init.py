@@ -1,8 +1,13 @@
 """Interactive `.env` wizard.
 
 Walks new users through the minimum config needed to run Serenity,
-section by section. Re-running picks up existing `.env` values as
-defaults, so it's safe to run repeatedly to refine setup.
+section by section. Designed to be safe to re-run: any field already
+present in `.env` is kept untouched, so re-running after a release
+that introduces new settings only prompts for the new (blank) fields.
+
+To change an existing value, use the `Settings` entry in the main menu
+(`serenity` without `--headless`) rather than this wizard — the wizard
+is the "fill in what's missing" tool.
 
 Conditional sections only ask for what you actually need: Alpaca is
 opt-in; Telegram fields appear only when you pick the telegram
@@ -29,21 +34,39 @@ def ask(
     env_var: str,
     current: str = "",
     *,
+    default: str = "",
     required: bool = False,
 ) -> str:
-    """Prompt for `field_name`, validate, write to `.env`. Loop on bad input.
+    """Prompt for `field_name`, validate, write to `.env`.
 
-    Returns the saved value, or "" if the user left a non-required
-    field blank. KeyboardInterrupt propagates — the top-level wizard
-    catches it and exits gracefully, treating Esc/Ctrl-C as "stop here,
-    keep whatever was already written".
+    If `current` already has a value (i.e. the env var is set in `.env`),
+    keep it and return without prompting — running the wizard a second
+    time should be a fast pass to fill in newly-added settings, not a
+    full re-entry.
+
+    Otherwise prompt with `default` as the prefill. Returns the saved
+    value (or `default` if a non-required field is left blank and a
+    default was supplied).
+
+    KeyboardInterrupt propagates — the top-level wizard catches it and
+    exits gracefully, treating Esc/Ctrl-C as "stop here, keep whatever
+    was already written".
     """
+    if current:
+        gum.style(f"  ✓ {env_var}: kept (Settings menu to change)", foreground="8")
+        return current
+
     while True:
-        raw = (prompt_new_value(field_name, env_var, current) or "").strip()
+        raw = (prompt_new_value(field_name, env_var, default) or "").strip()
         if not raw:
             if required:
                 gum.style(f"  ✗ {env_var} is required", foreground="9", bold=True)
                 continue
+            # Optional and blank: write the default if we had one, else nothing.
+            if default:
+                write(env_var, default)
+                gum.style(f"  ✓ {env_var}: {default} (default)", foreground="10")
+                return default
             return ""
         err = validate(field_name, raw)
         if err:
@@ -72,43 +95,55 @@ def main() -> None:
 def run() -> None:
     print()
     gum.style("Serenity Setup", foreground="14", bold=True)
-    gum.style(f"Writing to {ENV_FILE}. Esc/Ctrl-C aborts; progress is kept.", foreground="8")
+    gum.style(
+        f"Writing to {ENV_FILE}. Fields already in .env are kept; the "
+        "wizard only asks for what's missing. Use the Settings menu "
+        "(`serenity`) to change existing values. Esc/Ctrl-C aborts.",
+        foreground="8",
+    )
 
     existing = dotenv_values(ENV_FILE) if ENV_FILE.exists() else {}
-    get = lambda k, d="": existing.get(k, d)  # noqa: E731
+    cur = lambda k: existing.get(k, "")  # noqa: E731
 
     section("Step 1/5", "Required keys", "Without these the bot won't start.")
-    ask("openrouter_api_key", "OPENROUTER_API_KEY", get("OPENROUTER_API_KEY"), required=True)
-    ask("x_bearer_token", "X_BEARER_TOKEN", get("X_BEARER_TOKEN"), required=True)
-    ask("tracked_x_account", "TRACKED_X_ACCOUNT", get("TRACKED_X_ACCOUNT"), required=True)
+    ask("openrouter_api_key", "OPENROUTER_API_KEY", cur("OPENROUTER_API_KEY"), required=True)
+    ask("x_bearer_token", "X_BEARER_TOKEN", cur("X_BEARER_TOKEN"), required=True)
+    ask("tracked_x_account", "TRACKED_X_ACCOUNT", cur("TRACKED_X_ACCOUNT"), required=True)
 
     section(
         "Step 2/5",
         "Oracle & logging",
-        "Defaults work for most users. Hit Enter to keep them.",
+        "Defaults work for most users.",
     )
-    ask("sentiment_model", "SENTIMENT_MODEL", get("SENTIMENT_MODEL", "google/gemini-2.5-flash"))
-    ask("log_level", "LOG_LEVEL", get("LOG_LEVEL", "INFO"))
+    ask("sentiment_model", "SENTIMENT_MODEL", cur("SENTIMENT_MODEL"), default="google/gemini-2.5-flash")
+    ask("log_level", "LOG_LEVEL", cur("LOG_LEVEL"), default="INFO")
 
     section(
         "Step 3/5",
         "Trading",
-        "Per-trade sizing and (optional) Alpaca credentials. Notional is "
-        "sentiment * MAX, clamped to [MIN, MAX] and to available cash.",
+        "Per-trade sizing, risk caps, and (optional) Alpaca credentials. "
+        "Per-trade notional is sentiment * MAX_TRADE_USD, clamped to "
+        "[MIN, MAX] and to available cash. The runner enforces the "
+        "position and daily caps as hard limits — set to 0 to disable.",
     )
-    ask("min_confidence", "MIN_CONFIDENCE", get("MIN_CONFIDENCE", "0.7"))
-    ask("min_trade_usd", "MIN_TRADE_USD", get("MIN_TRADE_USD", "10.0"))
-    ask("max_trade_usd", "MAX_TRADE_USD", get("MAX_TRADE_USD", "100.0"))
-    if gum.confirm("Set up Alpaca credentials now?"):
-        ask("alpaca_api_key", "ALPACA_API_KEY", get("ALPACA_API_KEY"), required=True)
-        ask("alpaca_secret_key", "ALPACA_SECRET_KEY", get("ALPACA_SECRET_KEY"), required=True)
-        ask("alpaca_paper", "ALPACA_PAPER", get("ALPACA_PAPER", "True"))
+    ask("min_confidence", "MIN_CONFIDENCE", cur("MIN_CONFIDENCE"), default="0.7")
+    ask("min_trade_usd", "MIN_TRADE_USD", cur("MIN_TRADE_USD"), default="10.0")
+    ask("max_trade_usd", "MAX_TRADE_USD", cur("MAX_TRADE_USD"), default="100.0")
+    ask("max_position_usd", "MAX_POSITION_USD", cur("MAX_POSITION_USD"), default="500.0")
+    ask("max_trades_per_day", "MAX_TRADES_PER_DAY", cur("MAX_TRADES_PER_DAY"), default="20")
+
+    alpaca_already_set = bool(cur("ALPACA_API_KEY") and cur("ALPACA_SECRET_KEY"))
+    if alpaca_already_set or gum.confirm("Set up Alpaca credentials now?"):
+        ask("alpaca_api_key", "ALPACA_API_KEY", cur("ALPACA_API_KEY"), required=True)
+        ask("alpaca_secret_key", "ALPACA_SECRET_KEY", cur("ALPACA_SECRET_KEY"), required=True)
+        ask("alpaca_paper", "ALPACA_PAPER", cur("ALPACA_PAPER"), default="True")
 
     section("Step 4/5", "Alerts", "Where event notifications get delivered.")
     channel = ask(
         "alert_fallback_channel",
         "ALERT_FALLBACK_CHANNEL",
-        get("ALERT_FALLBACK_CHANNEL", "stdout"),
+        cur("ALERT_FALLBACK_CHANNEL"),
+        default="stdout",
         required=True,
     )
     if channel == "telegram":
@@ -120,21 +155,23 @@ def run() -> None:
             "  https://api.telegram.org/bot<TOKEN>/getUpdates and copy chat.id.",
             foreground="8",
         )
-        ask("telegram_bot_token", "TELEGRAM_BOT_TOKEN", get("TELEGRAM_BOT_TOKEN"), required=True)
-        ask("telegram_chat_id", "TELEGRAM_CHAT_ID", get("TELEGRAM_CHAT_ID"), required=True)
+        ask("telegram_bot_token", "TELEGRAM_BOT_TOKEN", cur("TELEGRAM_BOT_TOKEN"), required=True)
+        ask("telegram_chat_id", "TELEGRAM_CHAT_ID", cur("TELEGRAM_CHAT_ID"), required=True)
 
     section("Step 5/5", "Frequency", "How often the bot pings you.")
     freq = ask(
         "message_frequency",
         "MESSAGE_FREQUENCY",
-        get("MESSAGE_FREQUENCY", "per-tweet"),
+        cur("MESSAGE_FREQUENCY"),
+        default="per-tweet",
         required=True,
     )
     if freq == "daily":
         ask(
             "daily_message_delivery_utc",
             "DAILY_MESSAGE_DELIVERY_UTC",
-            get("DAILY_MESSAGE_DELIVERY_UTC", "21:30"),
+            cur("DAILY_MESSAGE_DELIVERY_UTC"),
+            default="21:30",
             required=True,
         )
 
