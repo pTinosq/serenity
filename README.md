@@ -29,6 +29,16 @@ curl -X POST "https://api.telegram.org/bot<TOKEN>/sendMessage" \
 
 If telegram is selected but credentials are missing, the dispatcher logs a warning and falls back to stdout — alerts are never silently dropped.
 
+## Deployment
+
+### Railway
+
+1. **Generate your config locally.** Run `just init` and walk through the wizard — it writes a `.env` you can copy from.
+2. **Create the Railway project from this GitHub repo.** New Project → Deploy from GitHub repo → pick `serenity`. Railway will build via the included `Dockerfile`.
+3. **Set the env vars.** In the service's Variables tab, paste every line from your `.env` (Railway has a "Raw editor" mode for bulk paste). `.env` itself is gitignored, so Railway never sees it from the repo.
+4. **Add a volume for the daily event log.** In Settings → Volumes, add one mounted at `/data`. Then set `EVENT_LOG_PATH=/data/event_log.jsonl` in Variables. Without this the container's working directory is read-only and daily-mode buffering will fail at startup (the bot will Telegram you about it).
+5. **Verify after deploy.** `railway run just doctor` — confirms env vars are present and the buffer path is writable. Expect "buffer probe OK at /data/event_log.jsonl".
+
 ## How it works
 
 1. Listen for new tweets from Serenity
