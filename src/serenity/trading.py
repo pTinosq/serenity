@@ -17,6 +17,7 @@ Paper trading is the default.
 from __future__ import annotations
 
 import logging
+from datetime import datetime, time, timezone
 from enum import Enum
 from functools import lru_cache
 
@@ -24,8 +25,8 @@ from alpaca.common.exceptions import APIError
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockLatestTradeRequest
 from alpaca.trading.client import TradingClient
-from alpaca.trading.enums import OrderSide, TimeInForce
-from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.enums import OrderSide, QueryOrderStatus, TimeInForce
+from alpaca.trading.requests import GetOrdersRequest, MarketOrderRequest
 
 from serenity.alerts import Alert, Messenger
 from serenity.config import Settings, load_settings
@@ -43,6 +44,7 @@ class TradeOutcome(str, Enum):
     SKIPPED_NOT_TRADEABLE = "skipped:not_tradeable"
     SKIPPED_NO_CASH = "skipped:no_cash"
     SKIPPED_NO_CREDENTIALS = "skipped:no_credentials"
+    SKIPPED_DAILY_CAP = "skipped:daily_cap"
     FAILED = "failed"
 
 
@@ -83,6 +85,23 @@ def size_trade(signal: TradeSignal, available_cash: float, settings: Settings) -
     """
     target = signal.sentiment * settings.max_trade_usd
     return min(target, settings.max_trade_usd, available_cash)
+
+
+def orders_submitted_today(client: TradingClient) -> int:
+    """Count orders Alpaca has seen on this account since UTC midnight.
+
+    Includes every status (filled, partial, cancelled, rejected, accepted, ...)
+    because the cap is about throttling intent-to-trade, not just successful
+    fills. Capped at the Alpaca API maximum of 500 — if we're over that the
+    daily cap is comfortably blown anyway.
+    """
+    midnight = datetime.combine(datetime.now(timezone.utc).date(), time.min, tzinfo=timezone.utc)
+    request = GetOrdersRequest(
+        status=QueryOrderStatus.ALL,
+        after=midnight,
+        limit=500,
+    )
+    return len(client.get_orders(filter=request))
 
 
 def is_fractional_short_rejection(e: APIError, side: OrderSide) -> bool:
@@ -197,6 +216,29 @@ def execute_trade(
         return TradeOutcome.SKIPPED_NO_CREDENTIALS
 
     client = get_client()
+
+    if settings.max_trades_per_day > 0:
+        today_count = orders_submitted_today(client)
+        if today_count >= settings.max_trades_per_day:
+            log.warning(
+                "Skipping %s: %d orders already today >= MAX_TRADES_PER_DAY %d",
+                signal.ticker,
+                today_count,
+                settings.max_trades_per_day,
+            )
+            Messenger.send(Alert(
+                reason="daily_cap",
+                title=f"{signal.ticker} skipped: daily trade cap reached ({today_count}/{settings.max_trades_per_day})",
+                signal=signal,
+                tweet=tweet,
+                detail=(
+                    f"The account has hit MAX_TRADES_PER_DAY ({settings.max_trades_per_day}). "
+                    "Further signals will be skipped until UTC midnight. Raise the cap or "
+                    "wait for tomorrow if you want to act on this."
+                ),
+            ))
+            return TradeOutcome.SKIPPED_DAILY_CAP
+
     cash = float(client.get_account().cash)
 
     if cash < settings.min_trade_usd:

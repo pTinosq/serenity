@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     min_confidence: Annotated[float, Ge(0.0), Le(1.0)] = 0.7
     min_trade_usd: Annotated[float, Ge(0.0)] = 10.0
     max_trade_usd: Annotated[float, Ge(0.0)] = 100.0
+    max_trades_per_day: Annotated[int, Ge(0)] = 20
 
     alpaca_api_key: SecretStr | None = None
     alpaca_secret_key: SecretStr | None = None
