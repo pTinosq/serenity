@@ -27,6 +27,7 @@ FIELDS: list[tuple[str, str]] = [
     ("alpaca_api_key", "ALPACA_API_KEY"),
     ("alpaca_secret_key", "ALPACA_SECRET_KEY"),
     ("alpaca_paper", "ALPACA_PAPER"),
+    ("allow_shorts", "ALLOW_SHORTS"),
     ("alert_fallback_channel", "ALERT_FALLBACK_CHANNEL"),
     ("telegram_bot_token", "TELEGRAM_BOT_TOKEN"),
     ("telegram_chat_id", "TELEGRAM_CHAT_ID"),

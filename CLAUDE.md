@@ -76,6 +76,7 @@ trades are skipped); `sentiment` is the *sizer*. Returns a
 - `SKIPPED_NOT_TRADEABLE` — Alpaca returned 40010001 ("asset not active" / "not found"). Most often the Oracle extracted a foreign-listed ticker that happened to be cashtagged like a US one (e.g. `$SIVE` is Sivers Semiconductors on Nasdaq Stockholm).
 - `SKIPPED_NO_CASH` — Alpaca cash balance below `MIN_TRADE_USD`.
 - `SKIPPED_NO_CREDENTIALS` — Alpaca keys not set; rest of pipeline runs.
+- `SKIPPED_SHORTS_DISABLED` — SELL signal on a ticker we don't currently hold, and `ALLOW_SHORTS` is False. See below.
 - `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
 
 Alpaca disallows fractional shorts: submitting a SELL with `notional`
@@ -85,6 +86,13 @@ the last trade price via `StockHistoricalDataClient`, recompute as
 costs more than the sized notional), the trade is skipped with
 `SKIPPED_PRICE_TOO_HIGH`. Closing-long SELLs on tickers we hold are
 not affected and continue to use fractional notional.
+
+`ALLOW_SHORTS` defaults to `False`. In this mode a SELL signal is treated
+as "close some of the existing long", not "open a new short". If the
+ticker isn't already held, the trade is skipped with
+`SKIPPED_SHORTS_DISABLED` and an alert fires so the user can act manually
+if they want exposure. Flip `ALLOW_SHORTS=True` to restore the old
+behaviour where SELLs on un-held tickers open whole-share shorts.
 
 `ALPACA_PAPER` defaults to `True`, so the default install is safe.
 The `TradingClient` is a process-wide singleton via

@@ -43,6 +43,7 @@ class TradeOutcome(str, Enum):
     SKIPPED_NOT_TRADEABLE = "skipped:not_tradeable"
     SKIPPED_NO_CASH = "skipped:no_cash"
     SKIPPED_NO_CREDENTIALS = "skipped:no_credentials"
+    SKIPPED_SHORTS_DISABLED = "skipped:shorts_disabled"
     FAILED = "failed"
 
 
@@ -83,6 +84,21 @@ def size_trade(signal: TradeSignal, available_cash: float, settings: Settings) -
     """
     target = signal.sentiment * settings.max_trade_usd
     return min(target, settings.max_trade_usd, available_cash)
+
+
+def has_long_position(client: TradingClient, symbol: str) -> bool:
+    """True if the account currently holds a non-zero long position in `symbol`.
+
+    Alpaca returns 404 (raised as APIError) when no position exists; treat
+    that as the empty case rather than letting it propagate.
+    """
+    try:
+        position = client.get_open_position(symbol)
+    except APIError as e:
+        if e.status_code in (404, 422):
+            return False
+        raise
+    return position.side == "long" and float(position.qty) > 0
 
 
 def is_fractional_short_rejection(e: APIError, side: OrderSide) -> bool:
@@ -222,6 +238,28 @@ def execute_trade(
         return TradeOutcome.SKIPPED_BELOW_MIN_TRADE
 
     side = OrderSide.BUY if signal.order_type == "BUY" else OrderSide.SELL
+
+    if side == OrderSide.SELL and not settings.allow_shorts:
+        if not has_long_position(client, signal.ticker):
+            log.info(
+                "Skipping SELL %s: no existing long position and ALLOW_SHORTS is False",
+                signal.ticker,
+            )
+            Messenger.send(Alert(
+                reason="shorts_disabled",
+                title=f"SELL {signal.ticker} skipped (no long position, shorts disabled)",
+                signal=signal,
+                amount=notional,
+                tweet=tweet,
+                detail=(
+                    "The Oracle flagged this as a SELL but you don't hold the name, "
+                    "so executing would open a new short. ALLOW_SHORTS is False, "
+                    "so the trade was skipped. Flip ALLOW_SHORTS to True in .env "
+                    "(or via Settings) if you want short opens on bearish signals."
+                ),
+            ))
+            return TradeOutcome.SKIPPED_SHORTS_DISABLED
+
     request = MarketOrderRequest(
         symbol=signal.ticker,
         notional=round(notional, 2),

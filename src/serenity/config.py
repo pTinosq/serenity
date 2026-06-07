@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     alpaca_api_key: SecretStr | None = None
     alpaca_secret_key: SecretStr | None = None
     alpaca_paper: bool = True
+    allow_shorts: bool = False
 
     alert_fallback_channel: Literal["stdout", "telegram"] = "stdout"
     telegram_bot_token: SecretStr | None = None
