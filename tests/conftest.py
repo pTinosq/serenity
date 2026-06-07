@@ -5,8 +5,6 @@ that don't actually exercise those values get a fixture-built Settings
 with safe placeholders so they don't depend on the user's real .env.
 """
 
-from __future__ import annotations
-
 from unittest.mock import patch
 
 import pytest

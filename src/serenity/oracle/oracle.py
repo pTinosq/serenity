@@ -6,8 +6,6 @@ sibling `prompt.md`; the structured output schema is derived from
 OpenRouter wiring.
 """
 
-from __future__ import annotations
-
 from pathlib import Path
 
 from serenity.agents.base import Agent, AgentError

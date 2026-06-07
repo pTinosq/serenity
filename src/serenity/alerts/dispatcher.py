@@ -15,8 +15,6 @@ calls (crashes) always go out immediately — out-of-band stuff
 shouldn't get summarized.
 """
 
-from __future__ import annotations
-
 import logging
 import traceback
 

@@ -4,8 +4,6 @@ Pure function — no Alpaca, no LLM. Lives in tests/ to anchor the
 pattern; add similar unit tests for the other guards as you go.
 """
 
-from __future__ import annotations
-
 import pytest
 
 from serenity.config import Settings

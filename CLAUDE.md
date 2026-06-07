@@ -234,6 +234,11 @@ right action but the wrong ticker is still useless.
   Both auto-load `.env` (`set dotenv-load := true`).
 - Single console-script entry point: `serenity = "serenity.main:main"`.
 - src-layout package under `src/serenity/`.
+- **Never** write `from __future__ import annotations`. This project
+  targets Python 3.12+ (`pyproject.toml` pins `>=3.12`); the future
+  import does nothing on modern Python and is just noise. Modern
+  union syntax (`X | None`), built-in generics (`list[str]`), and
+  string-quoted forward references all work natively.
 
 ## Workflow
 

@@ -27,8 +27,6 @@ A missing state file is treated as "empty account, $1000 cash" so a
 quick smoke test works with zero setup.
 """
 
-from __future__ import annotations
-
 import argparse
 import json
 import logging

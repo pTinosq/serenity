@@ -1,7 +1,5 @@
 """Fetch the user's current Alpaca positions as a normalised snapshot."""
 
-from __future__ import annotations
-
 from typing import Literal
 
 from alpaca.trading.client import TradingClient

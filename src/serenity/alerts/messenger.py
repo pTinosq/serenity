@@ -9,8 +9,6 @@ No global state — the dispatcher picks the active channel from
 settings on every call, so this Just Works from any module.
 """
 
-from __future__ import annotations
-
 from serenity.alerts.dispatcher import dispatch
 
 

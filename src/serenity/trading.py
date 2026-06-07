@@ -10,8 +10,6 @@ infrastructure layer: cached Alpaca client builders, and the
 sentiment-to-notional sizing utility.
 """
 
-from __future__ import annotations
-
 from functools import lru_cache
 
 from alpaca.trading.client import TradingClient

@@ -9,8 +9,6 @@ on top (cash check, position cap, etc.) so a misbehaving LLM can't blow
 the account up.
 """
 
-from __future__ import annotations
-
 from pathlib import Path
 
 from serenity.agents.base import Agent, AgentError

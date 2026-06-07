@@ -19,8 +19,6 @@ applied. The caller (main loop, CLI) decides what to do with the
 outcomes — log, alert, render, etc.
 """
 
-from __future__ import annotations
-
 import logging
 from datetime import datetime, time, timezone
 from enum import Enum

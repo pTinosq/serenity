@@ -11,8 +11,6 @@ Setup:
    `chat.id` into TELEGRAM_CHAT_ID.
 """
 
-from __future__ import annotations
-
 import json
 import logging
 from collections import defaultdict

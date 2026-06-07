@@ -6,8 +6,6 @@ root. Pydantic's `model_json_schema()` doesn't add it by default, so
 the harness walks the tree and locks each object node.
 """
 
-from __future__ import annotations
-
 from serenity.agents.base import _lock_down
 
 

@@ -13,8 +13,6 @@ subtly, miss new events that came in during the post-delivery
 window). Wait for the next clean slot.
 """
 
-from __future__ import annotations
-
 import logging
 import threading
 import time as time_mod
