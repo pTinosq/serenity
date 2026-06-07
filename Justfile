@@ -38,3 +38,7 @@ fmt:
 # Run the labeler web UI (http://localhost:3344) — see labeler/README.md
 labeler:
     cd labeler && npm install && npm run dev
+
+# Review the current Alpaca portfolio with the LLM reviewer (HOLD/TRIM/CLOSE)
+portfolio:
+    uv run python -m serenity.cli.portfolio

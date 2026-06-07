@@ -6,9 +6,10 @@ from serenity.ui import gum
 from serenity.ui.settings import open_settings
 
 START = "Start"
+REVIEW_PORTFOLIO = "Review portfolio"
 SETTINGS = "Settings"
 EXIT = "Exit"
-OPTIONS = [START, SETTINGS, EXIT]
+OPTIONS = [START, REVIEW_PORTFOLIO, SETTINGS, EXIT]
 
 
 def run_menu(on_start: Callable[[], None]) -> None:
@@ -26,6 +27,10 @@ def run_menu(on_start: Callable[[], None]) -> None:
         if choice == START:
             on_start()
             return
+        if choice == REVIEW_PORTFOLIO:
+            from serenity.cli.portfolio import main as review_portfolio
+            review_portfolio()
+            continue
         if choice == SETTINGS:
             open_settings()
             continue

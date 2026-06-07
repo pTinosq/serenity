@@ -90,6 +90,45 @@ not affected and continue to use fractional notional.
 The `TradingClient` is a process-wide singleton via
 `functools.lru_cache(maxsize=1)`, same pattern as the Oracle client.
 
+## Portfolio review
+
+The Oracle path opens one position per tweet without any awareness of
+what the account already holds — useful for entries, blind to the
+resulting book. `src/serenity/portfolio/` adds a counter-weight: an
+LLM agent that reads the whole snapshot at once and recommends per-
+position actions.
+
+Flow (`just portfolio`, or main menu → "Review portfolio"):
+
+1. Fetch all open positions from Alpaca (`fetch_portfolio`); each row
+   has cost basis, current price, unrealized P&L (USD + %), and a
+   `portfolio_fraction` precomputed against total |market_value|.
+2. Send the snapshot to the reviewer (`PortfolioReviewer.review`).
+   System prompt at `portfolio/prompt.md`; structured output enforced
+   via JSON schema (same wiring as Oracle). Same `SENTIMENT_MODEL` is
+   reused — no new setting.
+3. The model returns one `PositionAction` per ticker (HOLD / TRIM
+   `trim_fraction` / CLOSE) plus a one-line `summary`. The agent
+   validates coverage (every input ticker, no extras) before handing
+   back.
+4. Render two Rich tables — current book and recommendations — then
+   `gum.confirm` before any orders go in.
+5. On confirm, `execute_review` issues the non-HOLD actions via
+   `client.close_position(symbol, ClosePositionRequest(percentage=...))`
+   for TRIM and `close_position(symbol)` for CLOSE. The close-position
+   endpoint is symmetric across long/short, so the executor doesn't
+   need to invert sides for shorts.
+
+Read-only by default — no orders submit until the user confirms.
+Individual action failures are recorded but don't stop later actions
+(partial application beats silent drops).
+
+The reviewer's prompt is deliberately conservative: default to HOLD,
+take profit at ~+30% and beyond, cut losses at ~-20%, trim positions
+over 30% of the book. It only sees the snapshot — no news, no fresh
+sentiment — so it cannot replace tweet-driven entries; it complements
+them.
+
 ## Settings
 
 All config lives in `src/serenity/config.py` via `pydantic-settings`
