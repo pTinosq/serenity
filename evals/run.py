@@ -22,9 +22,16 @@ Pass --quiet to suppress the banner, per-case progress prints, and the
 verbose per-case table. Quiet mode prints only the summary plus a
 compact failures list — suitable for an LLM consumer reading the
 output without burning tokens on noise.
+
+Results are cached at `evals/.cache/` keyed by (model, prompt, tweet).
+A re-run with no changes hits the cache and never bills OpenRouter; any
+edit to `oracle/prompt.md` or change to SENTIMENT_MODEL transparently
+invalidates the affected entries. Pass --no-cache to bypass and force
+fresh calls.
 """
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -37,8 +44,10 @@ from rich.table import Table
 from serenity.config import load_settings
 from serenity.logging_config import setup_logging
 from serenity.oracle import Oracle, TradeSignal
+from serenity.oracle.oracle import system_prompt
 
 DATASET_PATH = Path(__file__).parent / "dataset.json"
+CACHE_DIR = Path(__file__).parent / ".cache"
 
 WEIGHT_TICKER = 0.4
 WEIGHT_ORDER = 0.5
@@ -89,6 +98,38 @@ class CaseOutcome(BaseModel):
     order_ok: bool = False
     conf_ok: bool = False
     weighted: float = 0.0
+    cached: bool = False
+
+
+def cache_key(model: str, prompt: str, tweet: str) -> str:
+    """Stable hash of the triple that fully determines an Oracle output.
+
+    Model id, system prompt body, and tweet text. Any edit to any of the
+    three invalidates this entry without touching the rest of the cache.
+    """
+    h = hashlib.sha256()
+    h.update(model.encode("utf-8"))
+    h.update(b"\x00")
+    h.update(prompt.encode("utf-8"))
+    h.update(b"\x00")
+    h.update(tweet.encode("utf-8"))
+    return h.hexdigest()
+
+
+def cache_get(key: str) -> TradeSignal | None:
+    path = CACHE_DIR / f"{key}.json"
+    if not path.exists():
+        return None
+    try:
+        return TradeSignal.model_validate_json(path.read_text(encoding="utf-8"))
+    except ValueError:
+        # Stale / corrupt entry — let the caller re-fetch and overwrite.
+        return None
+
+
+def cache_put(key: str, signal: TradeSignal) -> None:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    (CACHE_DIR / f"{key}.json").write_text(signal.model_dump_json(indent=2), encoding="utf-8")
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -102,6 +143,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "Print only the summary plus a compact failures list."
         ),
     )
+    parser.add_argument(
+        "--no-cache",
+        action="store_true",
+        help=(
+            "Bypass the on-disk result cache and force fresh OpenRouter "
+            "calls for every case. Useful for re-checking a model whose "
+            "output has changed without a prompt edit (rare)."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -110,11 +160,27 @@ def load_dataset() -> list[EvalCase]:
     return [EvalCase.model_validate(c) for c in raw]
 
 
-def evaluate_case(case: EvalCase, oracle: Oracle) -> CaseOutcome:
-    try:
-        signal = oracle.analyze(case.tweet)
-    except Exception as e:
-        return CaseOutcome(case=case, error=str(e))
+def evaluate_case(
+    case: EvalCase,
+    oracle: Oracle,
+    *,
+    use_cache: bool,
+    cache_namespace: tuple[str, str],
+) -> CaseOutcome:
+    cached = False
+    signal: TradeSignal | None = None
+    if use_cache:
+        key = cache_key(cache_namespace[0], cache_namespace[1], case.tweet)
+        signal = cache_get(key)
+        cached = signal is not None
+
+    if signal is None:
+        try:
+            signal = oracle.analyze(case.tweet)
+        except Exception as e:
+            return CaseOutcome(case=case, error=str(e))
+        if use_cache:
+            cache_put(cache_key(cache_namespace[0], cache_namespace[1], case.tweet), signal)
 
     expected_ticker = (case.result.ticker or "").upper()
     actual_ticker = (signal.ticker or "").upper()
@@ -136,6 +202,7 @@ def evaluate_case(case: EvalCase, oracle: Oracle) -> CaseOutcome:
         order_ok=order_ok,
         conf_ok=conf_ok,
         weighted=weighted,
+        cached=cached,
     )
 
 
@@ -257,19 +324,30 @@ def main() -> None:
     cases = load_dataset()
     oracle = Oracle(settings=settings)
 
+    cache_namespace = (settings.sentiment_model, system_prompt())
+    use_cache = not args.no_cache
+
     console = Console()
     if not args.quiet:
+        cache_label = "cache on" if use_cache else "cache off"
         console.print(
             f"Running [bold]{len(cases)}[/] case(s) through "
-            f"[bold cyan]{settings.sentiment_model}[/]...\n"
+            f"[bold cyan]{settings.sentiment_model}[/] ({cache_label})...\n"
         )
 
     outcomes: list[CaseOutcome] = []
     for i, case in enumerate(cases, 1):
+        outcome = evaluate_case(
+            case,
+            oracle,
+            use_cache=use_cache,
+            cache_namespace=cache_namespace,
+        )
         if not args.quiet:
             preview = case.tweet[:80] + ("..." if len(case.tweet) > 80 else "")
-            console.print(f"  [{i}/{len(cases)}] {preview}")
-        outcomes.append(evaluate_case(case, oracle))
+            tag = "[dim](cached)[/]" if outcome.cached else ""
+            console.print(f"  [{i}/{len(cases)}] {preview} {tag}")
+        outcomes.append(outcome)
 
     if not args.quiet:
         console.print()
@@ -277,6 +355,13 @@ def main() -> None:
 
     render_summary(outcomes, console)
     render_failures(outcomes, console)
+    if use_cache:
+        fresh = sum(1 for o in outcomes if not o.cached and o.error is None)
+        cached_n = sum(1 for o in outcomes if o.cached)
+        console.print(
+            f"\n[dim]Cache: {cached_n} hit, {fresh} fresh "
+            f"(saved {cached_n} OpenRouter call(s)).[/]"
+        )
 
 
 if __name__ == "__main__":
