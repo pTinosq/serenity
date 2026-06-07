@@ -43,6 +43,7 @@ class TradeOutcome(str, Enum):
     SKIPPED_NOT_TRADEABLE = "skipped:not_tradeable"
     SKIPPED_NO_CASH = "skipped:no_cash"
     SKIPPED_NO_CREDENTIALS = "skipped:no_credentials"
+    SKIPPED_POSITION_CAP = "skipped:position_cap"
     FAILED = "failed"
 
 
@@ -83,6 +84,24 @@ def size_trade(signal: TradeSignal, available_cash: float, settings: Settings) -
     """
     target = signal.sentiment * settings.max_trade_usd
     return min(target, settings.max_trade_usd, available_cash)
+
+
+def current_position_value(client: TradingClient, symbol: str) -> float:
+    """USD market value of the current position in `symbol`, signed.
+
+    Long positions are positive, shorts are negative. Returns 0 if no
+    position is open. Alpaca returns 404 when no position exists; treat
+    that as the empty case.
+    """
+    try:
+        position = client.get_open_position(symbol)
+    except APIError as e:
+        if e.status_code in (404, 422):
+            return 0.0
+        raise
+    if position.market_value is None:
+        return 0.0
+    return float(position.market_value)
 
 
 def is_fractional_short_rejection(e: APIError, side: OrderSide) -> bool:
@@ -222,6 +241,43 @@ def execute_trade(
         return TradeOutcome.SKIPPED_BELOW_MIN_TRADE
 
     side = OrderSide.BUY if signal.order_type == "BUY" else OrderSide.SELL
+
+    if side == OrderSide.BUY and settings.max_position_usd > 0:
+        position_value = abs(current_position_value(client, signal.ticker))
+        headroom = settings.max_position_usd - position_value
+        if headroom < settings.min_trade_usd:
+            log.info(
+                "Skipping BUY %s: position $%.2f >= cap $%.2f (headroom $%.2f < MIN $%.2f)",
+                signal.ticker,
+                position_value,
+                settings.max_position_usd,
+                headroom,
+                settings.min_trade_usd,
+            )
+            Messenger.send(Alert(
+                reason="position_cap",
+                title=f"BUY {signal.ticker} skipped (position cap ${settings.max_position_usd:.0f} reached)",
+                signal=signal,
+                amount=notional,
+                tweet=tweet,
+                detail=(
+                    f"Current {signal.ticker} position is ${position_value:.2f}, at or above "
+                    f"MAX_POSITION_USD (${settings.max_position_usd:.2f}). The signal was "
+                    "skipped to keep concentration in a single name capped. Raise "
+                    "MAX_POSITION_USD or trim the position manually if you want more exposure."
+                ),
+            ))
+            return TradeOutcome.SKIPPED_POSITION_CAP
+        if notional > headroom:
+            log.info(
+                "Sizing down BUY %s: $%.2f -> $%.2f to respect MAX_POSITION_USD ($%.2f)",
+                signal.ticker,
+                notional,
+                headroom,
+                settings.max_position_usd,
+            )
+            notional = headroom
+
     request = MarketOrderRequest(
         symbol=signal.ticker,
         notional=round(notional, 2),

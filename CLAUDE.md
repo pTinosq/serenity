@@ -76,6 +76,7 @@ trades are skipped); `sentiment` is the *sizer*. Returns a
 - `SKIPPED_NOT_TRADEABLE` — Alpaca returned 40010001 ("asset not active" / "not found"). Most often the Oracle extracted a foreign-listed ticker that happened to be cashtagged like a US one (e.g. `$SIVE` is Sivers Semiconductors on Nasdaq Stockholm).
 - `SKIPPED_NO_CASH` — Alpaca cash balance below `MIN_TRADE_USD`.
 - `SKIPPED_NO_CREDENTIALS` — Alpaca keys not set; rest of pipeline runs.
+- `SKIPPED_POSITION_CAP` — Existing position in this ticker is already at or above `MAX_POSITION_USD`, with less than `MIN_TRADE_USD` of headroom. Stops repeated bullish tweets from concentrating exposure in a single name. Set `MAX_POSITION_USD=0` to disable the cap.
 - `FAILED` — reserved; Alpaca errors raise `TradingError` instead.
 
 Alpaca disallows fractional shorts: submitting a SELL with `notional`
