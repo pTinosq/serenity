@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Generic, TypeVar
 
 from openrouter import OpenRouter
+from openrouter.errors import OpenRouterError
 from pydantic import BaseModel
 
 from serenity.config import Settings, load_settings
@@ -98,25 +99,30 @@ class Agent(Generic[OutputT]):
     def run(self, user_message: str) -> OutputT:
         """Send `user_message` to the model and return validated output.
 
-        Raises AgentError on empty content or schema-violating output.
-        Network / auth errors from the SDK propagate.
+        Raises AgentError on empty content, schema-violating output, or
+        any OpenRouter SDK error (rate limit, provider overload, transient
+        upstream failure). Wrapping SDK errors keeps a single bad call from
+        crashing the bot loop — the caller logs and moves to the next tweet.
         """
-        result = self.client.chat.send(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": self._read_prompt()},
-                {"role": "user", "content": user_message},
-            ],
-            temperature=self.temperature,
-            response_format={
-                "type": "json_schema",
-                "json_schema": {
-                    "name": self.name,
-                    "strict": True,
-                    "schema": self._schema(),
+        try:
+            result = self.client.chat.send(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": self._read_prompt()},
+                    {"role": "user", "content": user_message},
+                ],
+                temperature=self.temperature,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": self.name,
+                        "strict": True,
+                        "schema": self._schema(),
+                    },
                 },
-            },
-        )
+            )
+        except OpenRouterError as e:
+            raise AgentError(f"{self.name}: OpenRouter call failed: {e}") from e
         content = result.choices[0].message.content
         if not content:
             raise AgentError(f"{self.name}: model returned no content")
