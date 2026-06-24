@@ -29,6 +29,15 @@ curl -X POST "https://api.telegram.org/bot<TOKEN>/sendMessage" \
 
 If telegram is selected but credentials are missing, the dispatcher logs a warning and falls back to stdout — alerts are never silently dropped.
 
+### Delivery frequency
+
+`MESSAGE_FREQUENCY` controls how often you hear from the bot:
+
+- `per-tweet` (**default**) — fire a message immediately after every event. One message per thing; can get noisy if the tracked account tweets a lot.
+- `daily` — buffer events and deliver a single summary once a day at `DAILY_MESSAGE_DELIVERY_UTC` (HH:MM, 24h, UTC; default `21:30`).
+
+Fatal-error notifications always ship immediately regardless of this setting.
+
 ## Deployment
 
 ### Railway
